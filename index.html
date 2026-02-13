@@ -14,6 +14,7 @@
             --bg-light: #FFFFFF;
             --text-navy: #2C3E50;
             --border-color: #f0f0f0;
+            --s1-bg: #e2f3eb; /* Light green background for S1 column */
         }
 
         body {
@@ -27,7 +28,6 @@
             align-items: center;
         }
 
-        /* --- Top Utility Header --- */
         .utility-header {
             width: 100%;
             max-width: 1200px;
@@ -45,7 +45,6 @@
             text-transform: uppercase;
         }
 
-        /* --- Main Header Section --- */
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -81,7 +80,6 @@
             font-family: 'DM Sans';
         }
 
-        /* --- Responsive Grid --- */
         .calculator-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -92,33 +90,30 @@
             box-sizing: border-box;
         }
 
-        @media (max-width: 1024px) {
-            .calculator-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 600px) {
-            .calculator-grid { grid-template-columns: 1fr; }
-            .header h1 { text-align: left; }
-            .totals { flex-direction: column; gap: 20px !important; }
-            .send-btn { width: 100%; padding: 16px 20px; }
-            .utility-header { justify-content: center; }
-        }
-
         .column { display: flex; flex-direction: column; }
-        .module-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); min-height: 80px; }
-        .module-top { display: flex; align-items: center; cursor: pointer; }
         
-        .module-top input[type="checkbox"], .ob-switch input {
+        /* Squashed SentinelOne Column */
+        .column-s1 {
+            background-color: var(--s1-bg);
+            border-radius: 16px;
+            padding: 10px 15px !important;
+        }
+
+        .module-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); min-height: 80px; }
+        .column-s1 .module-item { min-height: 60px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
+        .module-top { display: flex; align-items: center; cursor: pointer; }
+        .module-top input[type="checkbox"] {
             width: 22px; height: 22px; margin-right: 15px; accent-color: var(--primary-green); flex-shrink: 0;
         }
 
-        .module-name { font-weight: 700; font-size: 15px; color: var(--text-navy); }
+        .module-name { font-weight: 700; font-size: 14px; color: var(--text-navy); }
 
-        .qty-container { margin-top: 10px; padding-left: 37px; display: none; }
+        .qty-container { margin-top: 5px; padding-left: 37px; display: none; }
         .qty-container.active { display: flex; align-items: center; gap: 10px; }
-        .qty-container input, .ob-input { width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans'; }
+        .qty-container input { width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans'; }
 
-        /* --- Onboarding Section --- */
+        /* Onboarding */
         .onboarding-section {
             width: 95%;
             max-width: 1200px;
@@ -145,18 +140,25 @@
         .badge-free { background: #e8f5e9; color: #2e7d32; }
         .badge-paid { background: #fff3e0; color: #ef6c00; }
 
-        /* --- Footer Totals & CTA --- */
         .footer-cta { margin-top: 60px; width: 95%; max-width: 1200px; text-align: center; padding-bottom: 60px; }
-        .totals { display: flex; justify-content: center; gap: clamp(20px, 8vw, 80px); margin-bottom: 40px; }
+        .totals { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
         .total-box h3 { font-size: 12px; opacity: 0.5; margin: 0; letter-spacing: 1px; }
         .total-box p { font-size: clamp(24px, 5vw, 36px); font-weight: 700; margin: 5px 0; color: var(--primary-green); }
 
         .send-btn {
             background-color: var(--accent-red); color: white; border: none; padding: 16px 80px;
             border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 15px; transition: transform 0.2s;
+            display: inline-flex; align-items: center; gap: 15px;
         }
-        .send-btn:active { transform: scale(0.98); }
+
+        @media (max-width: 1024px) {
+            .calculator-grid { grid-template-columns: repeat(2, 1fr); }
+            .column-s1 { margin-top: 20px; }
+        }
+
+        @media (max-width: 600px) {
+            .calculator-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -179,7 +181,7 @@
         <div class="column" id="col-1"></div>
         <div class="column" id="col-2"></div>
         <div class="column" id="col-3"></div>
-        <div class="column" id="col-4"></div>
+        <div class="column column-s1" id="col-4"></div>
     </div>
 
     <div class="onboarding-section">
@@ -187,14 +189,12 @@
         <div class="ob-controls">
             <div>
                 <label style="display:block; margin-bottom:8px; font-size:13px;">Total Company Employees</label>
-                <input type="number" id="ob-employees" value="0" min="0" class="ob-input" oninput="calculate()">
+                <input type="number" id="ob-employees" value="0" min="0" style="width:80px; padding:6px; border:1px solid #ddd; border-radius:4px;" oninput="calculate()">
             </div>
-            
             <div class="ob-switch" onclick="toggleIT()">
                 <input type="checkbox" id="ob-has-it" onchange="calculate()">
                 <span>Company has internal IT Person</span>
             </div>
-
             <div id="ob-result-ui" style="flex-grow: 1;">
                 <div id="ob-tier-name" style="font-weight:700; font-size:15px;">-</div>
                 <div id="ob-tier-badge" class="ob-badge">Select employees</div>
@@ -206,15 +206,14 @@
     <div class="footer-cta">
         <div class="totals">
             <div class="total-box">
-                <h3>ONBOARDING (ONE-TIME)</h3>
+                <h3>ONBOARDING</h3>
                 <p id="total-ob">0,00 €</p>
             </div>
             <div class="total-box">
-                <h3>TOTAL MONTHLY (MRR)</h3>
+                <h3>MONTHLY (MRR)</h3>
                 <p id="total-mrr">0,00 €</p>
             </div>
         </div>
-
         <button class="send-btn">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             Send Quote
@@ -223,16 +222,21 @@
 
 <script>
     const modules = [
-        { name: "SaaS + MDM", cost: 10, col: 1 },
-        { name: "SaaS Management", cost: 3.9, col: 1 },
-        { name: "MDM Pc", cost: 7, col: 2 },
-        { name: "MDM Mobile", cost: 3.5, col: 2 },
-        { name: "ThreatDown EDR", cost: 3.5, col: 3 },
-        { name: "ThreatDown MDR", cost: 7, col: 3 },
-        { name: "SentinelOne Control", cost: 4.4, col: 4 },
-        { name: "SentinelOne Complete", cost: 7.8, col: 4 },
-        { name: "SentinelOne Vigilance", cost: 10.4, col: 4 }
+        { id: "saas-mdm", name: "SaaS + MDM", cost: 10, col: 1 },
+        { id: "saas", name: "SaaS Management", cost: 3.9, col: 1 },
+        { id: "mdm-pc", name: "MDM Pc", cost: 7, col: 2 },
+        { id: "mdm-mobile", name: "MDM Mobile", cost: 3.5, col: 2 },
+        { id: "td-edr", name: "ThreatDown EDR", cost: 3.5, col: 3 },
+        { id: "td-mdr", name: "ThreatDown MDR", cost: 7, col: 3 },
+        { id: "s1-control", name: "SentinelOne Control", cost: 4.4, col: 4 },
+        { id: "s1-complete", name: "SentinelOne Complete", cost: 7.8, col: 4 },
+        { id: "s1-vigilance", name: "SentinelOne Vigilance", cost: 10.4, col: 4 }
     ];
+
+    // Exclusivity Rules
+    const securityGroup = ["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"];
+    const mdmGroup = ["saas-mdm", "mdm-pc", "mdm-mobile"];
+    const saasGroup = ["saas-mdm", "saas"];
 
     const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 
@@ -242,8 +246,8 @@
             const item = document.createElement('div');
             item.className = 'module-item';
             item.innerHTML = `
-                <div class="module-top" onclick="toggle(${i})">
-                    <input type="checkbox" id="check-${i}" onclick="event.stopPropagation(); calculate();">
+                <div class="module-top" onclick="handleExclusivity('${mod.id}', ${i})">
+                    <input type="checkbox" id="check-${i}" onclick="event.stopPropagation(); handleExclusivity('${mod.id}', ${i})">
                     <span class="module-name">${mod.name}</span>
                 </div>
                 <div class="qty-container" id="qty-box-${i}">
@@ -256,9 +260,39 @@
         calculate();
     }
 
-    function toggle(i) {
-        document.getElementById(`check-${i}`).checked = !document.getElementById(`check-${i}`).checked;
+    function handleExclusivity(id, index) {
+        const checkbox = document.getElementById(`check-${index}`);
+        // Toggle the target checkbox if it wasn't triggered by the click directly
+        if (event.target.type !== 'checkbox') {
+            checkbox.checked = !checkbox.checked;
+        }
+
+        if (checkbox.checked) {
+            // Rule 1: Security Mutually Exclusive
+            if (securityGroup.includes(id)) {
+                securityGroup.forEach(item_id => {
+                    if (item_id !== id) uncheckById(item_id);
+                });
+            }
+            // Rule 2: MDM Bundles
+            if (mdmGroup.includes(id)) {
+                mdmGroup.forEach(item_id => {
+                    if (item_id !== id) uncheckById(item_id);
+                });
+            }
+            // Rule 3: SaaS Bundles
+            if (saasGroup.includes(id)) {
+                saasGroup.forEach(item_id => {
+                    if (item_id !== id) uncheckById(item_id);
+                });
+            }
+        }
         calculate();
+    }
+
+    function uncheckById(id) {
+        const idx = modules.findIndex(m => m.id === id);
+        if (idx !== -1) document.getElementById(`check-${idx}`).checked = false;
     }
 
     function toggleIT() {
@@ -292,19 +326,12 @@
         if (emps > 0) {
             if (emps < 100) {
                 if (hasIT) {
-                    tierText = "Self-Service SMB";
-                    badgeClass = "badge-free";
-                    note = "Free via Help Center";
-                    obCost = 0;
+                    tierText = "Self-Service SMB"; badgeClass = "badge-free"; note = "Free via Help Center"; obCost = 0;
                 } else {
-                    tierText = "Expert Deployment";
-                    badgeClass = "badge-paid";
-                    note = "2h Expert Config & Deployment";
-                    obCost = 200;
+                    tierText = "Expert Deployment"; badgeClass = "badge-paid"; note = "2h Expert Deployment"; obCost = 200;
                 }
             } else {
-                tierText = "Enterprise Configuration";
-                badgeClass = "badge-paid";
+                tierText = "Enterprise Configuration"; badgeClass = "badge-paid";
                 const hours = Math.ceil(emps / 100) * 2;
                 obCost = hours * 100;
                 note = `${hours}h dedicated engineering`;
@@ -315,7 +342,6 @@
         document.getElementById('ob-tier-badge').className = `ob-badge ${badgeClass}`;
         document.getElementById('ob-tier-badge').innerText = emps > 0 ? "Active" : "Select employees";
         document.getElementById('ob-pricing-note').innerText = note;
-
         document.getElementById('total-ob').innerText = euro.format(obCost);
         document.getElementById('total-mrr').innerText = euro.format(mrrTotal);
     }
