@@ -14,7 +14,7 @@
             --bg-light: #FFFFFF;
             --text-navy: #2C3E50;
             --border-color: #f0f0f0;
-            --module-bg: #f2faf7; /* Light green for the main module groups */
+            --unified-bg: #f2faf7; /* Unified light green background */
         }
 
         body {
@@ -79,41 +79,31 @@
             font-family: 'DM Sans';
         }
 
-        /* --- Main Calculator Layout --- */
-        .calculator-wrapper {
+        /* --- Unified Module Container --- */
+        .unified-module-container {
             display: grid;
-            grid-template-columns: 3fr 1fr; /* 3 parts for main modules, 1 part for S1 */
+            grid-template-columns: repeat(4, 1fr); /* 4-column layout */
             gap: 20px;
             width: 95%;
             max-width: 1200px;
+            background-color: var(--unified-bg);
+            padding: 30px;
+            border-radius: 24px;
             box-sizing: border-box;
-        }
-
-        /* Shared Background for SaaS, MDM, and ThreatDown */
-        .main-modules-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            background-color: var(--module-bg);
-            padding: 25px;
-            border-radius: 20px;
-        }
-
-        /* SentinelOne Column */
-        .column-s1 {
-            background-color: #e2f3eb; /* Slightly darker/distinct green for S1 */
-            border-radius: 20px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
         }
 
         .column { display: flex; flex-direction: column; }
         
+        /* SentinelOne column specific alignment (Squashed) */
+        .column-s1 .module-item {
+            min-height: 60px;
+            padding: 10px 0;
+        }
+
         .module-item { 
-            padding: 12px 0; 
+            padding: 15px 0; 
             border-bottom: 1px solid rgba(66, 184, 145, 0.1); 
-            min-height: 70px; 
+            min-height: 80px; 
         }
 
         .module-top { display: flex; align-items: center; cursor: pointer; }
@@ -126,20 +116,20 @@
         .qty-container { margin-top: 5px; padding-left: 37px; display: none; }
         .qty-container.active { display: flex; align-items: center; gap: 10px; }
         .qty-container input { 
-            width: 60px; 
+            width: 65px; 
             padding: 4px; 
             border: 1px solid var(--primary-green); 
             border-radius: 4px; 
             font-family: 'DM Sans'; 
         }
 
-        /* --- Onboarding Section (Kept outside the green background) --- */
+        /* --- Onboarding Section (White background) --- */
         .onboarding-section {
             width: 95%;
             max-width: 1200px;
-            margin-top: 30px;
+            margin-top: 40px;
             padding: 30px;
-            background: #fdfdfd;
+            background: #FFFFFF;
             border-radius: 16px;
             border: 1px solid var(--border-color);
             box-sizing: border-box;
@@ -174,11 +164,10 @@
 
         /* Responsiveness */
         @media (max-width: 1024px) {
-            .calculator-wrapper { grid-template-columns: 1fr; }
-            .main-modules-container { grid-template-columns: repeat(2, 1fr); }
+            .unified-module-container { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 600px) {
-            .main-modules-container { grid-template-columns: 1fr; }
+            .unified-module-container { grid-template-columns: 1fr; }
             .totals { flex-direction: column; gap: 20px; }
         }
     </style>
@@ -199,12 +188,8 @@
         <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
     </div>
 
-    <div class="calculator-wrapper">
-        <div class="main-modules-container">
-            <div class="column" id="col-1"></div> <div class="column" id="col-2"></div> <div class="column" id="col-3"></div> </div>
-
-        <div class="column column-s1" id="col-4"></div>
-    </div>
+    <div class="unified-module-container">
+        <div class="column" id="col-1"></div> <div class="column" id="col-2"></div> <div class="column" id="col-3"></div> <div class="column column-s1" id="col-4"></div> </div>
 
     <div class="onboarding-section">
         <div class="ob-header">Onboarding Configuration</div>
