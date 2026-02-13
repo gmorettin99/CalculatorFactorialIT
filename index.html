@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Calculator</title>
+    <title>Module Calculator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
 
         .container {
             background: var(--card-bg);
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             padding: 40px;
             border-radius: 20px;
@@ -36,141 +36,199 @@
             border: 1px solid var(--border);
         }
 
-        h2 { color: var(--primary); margin-bottom: 30px; }
+        h2 { color: var(--primary); margin-bottom: 10px; }
+        p.subtitle { margin-bottom: 30px; opacity: 0.7; }
 
-        .input-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .config-bar {
+            background: #f0fdf9;
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--bg);
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        label { display: block; font-weight: 500; margin-bottom: 8px; }
+        label { font-weight: 500; font-size: 14px; }
         
-        input {
-            width: 100%;
-            padding: 12px;
+        input[type="number"] {
+            padding: 10px;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: 'DM Sans';
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
-        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--primary); }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-
-        .total-row {
-            font-weight: 700;
-            background: #f0fdf9;
-            color: var(--primary);
+        th { 
+            text-align: left; 
+            padding: 15px; 
+            border-bottom: 2px solid var(--primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .btn-calculate {
-            background: var(--primary);
+        td { padding: 15px; border-bottom: 1px solid #eee; transition: all 0.3s ease; }
+
+        .qty-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .qty-box.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .total-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--navy);
             color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-weight: 700;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            text-align: center;
+        }
+
+        .total-box span { display: block; font-size: 12px; opacity: 0.8; margin-bottom: 5px; }
+        .total-box strong { font-size: 24px; color: var(--primary); }
+
+        /* Custom Checkbox Style */
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
             cursor: pointer;
-            width: 100%;
-            font-size: 18px;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Service Calculator</h2>
+    <h2>Solutions Calculator</h2>
+    <p class="subtitle">Select the modules required and input the number of licenses for each.</p>
     
-    <div class="input-group">
-        <div>
-            <label>Number of Employees</label>
-            <input type="number" id="employees" value="100" oninput="calculate()">
-        </div>
-        <div>
-            <label>Discount (%)</label>
-            <input type="number" id="discount" value="0" oninput="calculate()">
-        </div>
+    <div class="config-bar">
+        <label>Global Discount (%)</label>
+        <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Module</th>
-                <th>Monthly (After Discount)</th>
-                <th>Annual (After Discount)</th>
+                <th style="width: 50px;">Use</th>
+                <th>Module Name</th>
+                <th style="width: 150px;"># Licenses</th>
+                <th style="text-align: right;">Subtotal (Monthly)</th>
             </tr>
         </thead>
-        <tbody id="results-body">
+        <tbody id="table-body">
             </tbody>
-        <tfoot>
-            <tr class="total-row">
-                <td>Total Estimate</td>
-                <td id="total-mrr">$0.00</td>
-                <td id="total-arr">$0.00</td>
-            </tr>
-        </tfoot>
     </table>
+
+    <div class="total-section">
+        <div class="total-box">
+            <span>TOTAL MONTHLY (MRR)</span>
+            <strong id="total-mrr">€0,00</strong>
+        </div>
+        <div class="total-box">
+            <span>TOTAL ANNUAL (ARR)</span>
+            <strong id="total-arr">€0,00</strong>
+        </div>
+    </div>
 </div>
 
 <script>
-    // These match your Excel "Cost month" column but are hidden from the UI
-    const costs = {
-        "SaaS Management": 3.9,
-        "MDM": 7,
-        "SaaS + MDM": 10,
-        "Mobile": 3.5,
-        "ThreatDown EDR": 3.5,
-        "ThreatDown MDR": 7,
-        "SentinelOne Control": 4.4,
-        "SentinelOne Complete": 7.8,
-        "SentinelOne Vigilance": 10.4
-    };
+    // Hidden internal costs as requested
+    const modules = [
+        { name: "SaaS Management", cost: 3.9 },
+        { name: "MDM", cost: 7 },
+        { name: "SaaS + MDM", cost: 10 },
+        { name: "Mobile", cost: 3.5 },
+        { name: "ThreatDown EDR", cost: 3.5 },
+        { name: "ThreatDown MDR", cost: 7 },
+        { name: "SentinelOne Control", cost: 4.4 },
+        { name: "SentinelOne Complete", cost: 7.8 },
+        { name: "SentinelOne Vigilance", cost: 10.4 }
+    ];
 
-    function calculate() {
-        const empCount = parseFloat(document.getElementById('employees').value) || 0;
-        const discountPct = (parseFloat(document.getElementById('discount').value) || 0) / 100;
-        const tbody = document.getElementById('results-body');
-        
-        let totalMRR = 0;
-        let totalARR = 0;
-        tbody.innerHTML = "";
+    const euroFormat = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+    });
 
-        for (const [module, cost] of Object.entries(costs)) {
-            // Excel Formula: =MULTIPLY(Cost, Employees)
-            const rawMRR = cost * empCount;
-            // Excel Formula: =MRR * (1 - Discount)
-            const discountedMRR = rawMRR * (1 - discountPct);
-            // Excel Formula: =MULTIPLY(MRR_Discount, 12)
-            const discountedARR = discountedMRR * 12;
-
-            totalMRR += discountedMRR;
-            totalARR += discountedARR;
-
-            const row = `<tr>
-                <td>${module}</td>
-                <td>$${discountedMRR.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                <td>$${discountedARR.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        }
-
-        document.getElementById('total-mrr').innerText = `$${totalMRR.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-        document.getElementById('total-arr').innerText = `$${totalARR.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+    function initTable() {
+        const container = document.getElementById('table-body');
+        modules.forEach((mod, i) => {
+            const row = document.createElement('tr');
+            row.id = `row-${i}`;
+            row.innerHTML = `
+                <td><input type="checkbox" id="check-${i}" onchange="updateRow(${i})"></td>
+                <td><strong>${mod.name}</strong></td>
+                <td>
+                    <div class="qty-box" id="qty-container-${i}">
+                        <input type="number" id="qty-${i}" value="0" min="0" style="width: 80px;" oninput="calculate()">
+                    </div>
+                </td>
+                <td style="text-align: right;" id="subtotal-${i}">€0,00</td>
+            `;
+            container.appendChild(row);
+        });
     }
 
-    // Initial run
-    calculate();
+    function updateRow(index) {
+        const isChecked = document.getElementById(`check-${index}`).checked;
+        const qtyContainer = document.getElementById(`qty-container-${index}`);
+        const row = document.getElementById(`row-${index}`);
+        
+        if (isChecked) {
+            qtyContainer.classList.add('visible');
+            row.style.backgroundColor = "#f9fdfc";
+        } else {
+            qtyContainer.classList.remove('visible');
+            document.getElementById(`qty-${index}`).value = 0;
+            row.style.backgroundColor = "transparent";
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const discount = (parseFloat(document.getElementById('discount').value) || 0) / 100;
+        let grandTotalMRR = 0;
+
+        modules.forEach((mod, i) => {
+            const isChecked = document.getElementById(`check-${i}`).checked;
+            const qty = parseFloat(document.getElementById(`qty-${i}`).value) || 0;
+            const subtotalDisplay = document.getElementById(`subtotal-${i}`);
+            
+            if (isChecked) {
+                // Formula: Cost * Licenses * (1 - Discount)
+                const subtotal = (mod.cost * qty) * (1 - discount);
+                grandTotalMRR += subtotal;
+                subtotalDisplay.innerText = euroFormat.format(subtotal);
+                subtotalDisplay.style.opacity = "1";
+            } else {
+                subtotalDisplay.innerText = euroFormat.format(0);
+                subtotalDisplay.style.opacity = "0.3";
+            }
+        });
+
+        const grandTotalARR = grandTotalMRR * 12;
+        document.getElementById('total-mrr').innerText = euroFormat.format(grandTotalMRR);
+        document.getElementById('total-arr').innerText = euroFormat.format(grandTotalARR);
+    }
+
+    initTable();
 </script>
 
 </body>
