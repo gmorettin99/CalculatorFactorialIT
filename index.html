@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Module Calculator</title>
+    <title>Quote Calculator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #42B891;
-            --bg: #FAFAFA;
-            --navy: #2C3E50;
-            --border: #A7E2D1;
-            --card-bg: #FFFFFF;
+            --primary: #42B891; /* From your SVG */
+            --bg: #FAFAFA;      /* From your SVG */
+            --navy: #2C3E50;    /* For professional text */
+            --border: #A7E2D1;  /* Light green border from SVG */
+            --white: #FFFFFF;
         }
 
         body {
@@ -27,7 +28,7 @@
         }
 
         .container {
-            background: var(--card-bg);
+            background: var(--white);
             max-width: 900px;
             width: 100%;
             padding: 40px;
@@ -36,8 +37,8 @@
             border: 1px solid var(--border);
         }
 
-        h2 { color: var(--primary); margin-bottom: 10px; }
-        p.subtitle { margin-bottom: 30px; opacity: 0.7; }
+        h2 { color: var(--primary); margin-top: 0; margin-bottom: 10px; }
+        p.subtitle { margin-bottom: 30px; opacity: 0.7; font-size: 14px; }
 
         .config-bar {
             background: #f0fdf9;
@@ -57,6 +58,7 @@
             border-radius: 6px;
             font-size: 15px;
             font-family: 'DM Sans';
+            outline-color: var(--primary);
         }
 
         table {
@@ -68,55 +70,51 @@
             text-align: left; 
             padding: 15px; 
             border-bottom: 2px solid var(--primary);
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        td { padding: 15px; border-bottom: 1px solid #eee; transition: all 0.3s ease; }
+        td { padding: 15px; border-bottom: 1px solid #eee; transition: background 0.2s; }
 
-        .qty-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
+        .qty-input-container {
+            display: none; /* Hidden by default until checked */
         }
 
-        .qty-box.visible {
-            opacity: 1;
-            pointer-events: auto;
+        .qty-input-container.active {
+            display: block;
         }
 
         .total-section {
             margin-top: 30px;
-            padding: 20px;
+            padding: 25px;
             background: var(--navy);
             color: white;
             border-radius: 12px;
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 20px;
             text-align: center;
         }
 
-        .total-box span { display: block; font-size: 12px; opacity: 0.8; margin-bottom: 5px; }
-        .total-box strong { font-size: 24px; color: var(--primary); }
+        .total-box span { display: block; font-size: 11px; opacity: 0.8; margin-bottom: 8px; letter-spacing: 1px; }
+        .total-box strong { font-size: 28px; color: var(--primary); }
 
-        /* Custom Checkbox Style */
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             accent-color: var(--primary);
             cursor: pointer;
         }
+
+        .row-selected { background-color: #fafffd; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Solutions Calculator</h2>
-    <p class="subtitle">Select the modules required and input the number of licenses for each.</p>
+    <p class="subtitle">Check a box to include the module and set the specific number of licenses required.</p>
     
     <div class="config-bar">
         <label>Global Discount (%)</label>
@@ -126,9 +124,9 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 50px;">Use</th>
+                <th style="width: 60px;">Select</th>
                 <th>Module Name</th>
-                <th style="width: 150px;"># Licenses</th>
+                <th style="width: 160px;"># Licenses</th>
                 <th style="text-align: right;">Subtotal (Monthly)</th>
             </tr>
         </thead>
@@ -139,17 +137,17 @@
     <div class="total-section">
         <div class="total-box">
             <span>TOTAL MONTHLY (MRR)</span>
-            <strong id="total-mrr">€0,00</strong>
+            <strong id="total-mrr">0,00 €</strong>
         </div>
         <div class="total-box">
             <span>TOTAL ANNUAL (ARR)</span>
-            <strong id="total-arr">€0,00</strong>
+            <strong id="total-arr">0,00 €</strong>
         </div>
     </div>
 </div>
 
 <script>
-    // Hidden internal costs as requested
+    // Hidden internal costs as requested from your screenshot
     const modules = [
         { name: "SaaS Management", cost: 3.9 },
         { name: "MDM", cost: 7 },
@@ -162,73 +160,79 @@
         { name: "SentinelOne Vigilance", cost: 10.4 }
     ];
 
-    const euroFormat = new Intl.NumberFormat('de-DE', {
+    // Formatter for European Euro style (e.g. 1.234,56 €)
+    const euro = new Intl.NumberFormat('de-DE', {
         style: 'currency',
         currency: 'EUR',
     });
 
-    function initTable() {
-        const container = document.getElementById('table-body');
+    function buildTable() {
+        const tbody = document.getElementById('table-body');
         modules.forEach((mod, i) => {
             const row = document.createElement('tr');
-            row.id = `row-${i}`;
+            row.id = `tr-${i}`;
             row.innerHTML = `
-                <td><input type="checkbox" id="check-${i}" onchange="updateRow(${i})"></td>
+                <td><input type="checkbox" id="check-${i}" onchange="handleToggle(${i})"></td>
                 <td><strong>${mod.name}</strong></td>
                 <td>
-                    <div class="qty-box" id="qty-container-${i}">
-                        <input type="number" id="qty-${i}" value="0" min="0" style="width: 80px;" oninput="calculate()">
+                    <div class="qty-input-container" id="qty-box-${i}">
+                        <input type="number" id="qty-${i}" value="0" min="0" style="width: 90px;" oninput="calculate()">
                     </div>
                 </td>
-                <td style="text-align: right;" id="subtotal-${i}">€0,00</td>
+                <td style="text-align: right;" id="sub-${i}">0,00 €</td>
             `;
-            container.appendChild(row);
+            tbody.appendChild(row);
         });
     }
 
-    function updateRow(index) {
-        const isChecked = document.getElementById(`check-${index}`).checked;
-        const qtyContainer = document.getElementById(`qty-container-${index}`);
-        const row = document.getElementById(`row-${index}`);
+    function handleToggle(index) {
+        const checkbox = document.getElementById(`check-${index}`);
+        const qtyBox = document.getElementById(`qty-box-${index}`);
+        const row = document.getElementById(`tr-${index}`);
         
-        if (isChecked) {
-            qtyContainer.classList.add('visible');
-            row.style.backgroundColor = "#f9fdfc";
+        if (checkbox.checked) {
+            qtyBox.classList.add('active');
+            row.classList.add('row-selected');
         } else {
-            qtyContainer.classList.remove('visible');
-            document.getElementById(`qty-${index}`).value = 0;
-            row.style.backgroundColor = "transparent";
+            qtyBox.classList.remove('active');
+            row.classList.remove('row-selected');
+            document.getElementById(`qty-${index}`).value = 0; // Reset count if unchecked
         }
         calculate();
     }
 
     function calculate() {
-        const discount = (parseFloat(document.getElementById('discount').value) || 0) / 100;
-        let grandTotalMRR = 0;
+        const discountValue = parseFloat(document.getElementById('discount').value) || 0;
+        const discountMultiplier = (100 - discountValue) / 100;
+        
+        let totalMRR = 0;
 
         modules.forEach((mod, i) => {
             const isChecked = document.getElementById(`check-${i}`).checked;
-            const qty = parseFloat(document.getElementById(`qty-${i}`).value) || 0;
-            const subtotalDisplay = document.getElementById(`subtotal-${i}`);
+            const subtotalDisplay = document.getElementById(`sub-${i}`);
             
             if (isChecked) {
-                // Formula: Cost * Licenses * (1 - Discount)
-                const subtotal = (mod.cost * qty) * (1 - discount);
-                grandTotalMRR += subtotal;
-                subtotalDisplay.innerText = euroFormat.format(subtotal);
+                const licenses = parseFloat(document.getElementById(`qty-${i}`).value) || 0;
+                // Formula: (Cost per License * Number of Licenses) * Discount
+                const itemTotal = (mod.cost * licenses) * discountMultiplier;
+                
+                totalMRR += itemTotal;
+                subtotalDisplay.innerText = euro.format(itemTotal);
                 subtotalDisplay.style.opacity = "1";
             } else {
-                subtotalDisplay.innerText = euroFormat.format(0);
+                subtotalDisplay.innerText = euro.format(0);
                 subtotalDisplay.style.opacity = "0.3";
             }
         });
 
-        const grandTotalARR = grandTotalMRR * 12;
-        document.getElementById('total-mrr').innerText = euroFormat.format(grandTotalMRR);
-        document.getElementById('total-arr').innerText = euroFormat.format(grandTotalARR);
+        const totalARR = totalMRR * 12;
+        
+        document.getElementById('total-mrr').innerText = euro.format(totalMRR);
+        document.getElementById('total-arr').innerText = euro.format(totalARR);
     }
 
-    initTable();
+    // Initialize the app
+    buildTable();
 </script>
 
 </body>
