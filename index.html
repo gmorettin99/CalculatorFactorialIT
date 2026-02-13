@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factorial IT - Quote Calculator</title>
+    <title>Factorial IT - Adaptive Quote Calculator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -21,34 +21,78 @@
             background-color: var(--bg-light);
             color: var(--text-navy);
             margin: 0;
-            padding: 40px 0;
+            padding: 20px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 { font-size: 48px; font-weight: 700; line-height: 1.1; color: #1a1a1a; margin: 0; }
+        /* --- Header Section --- */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: clamp(28px, 5vw, 48px); /* Dynamically scales font size */
+            font-weight: 700;
+            line-height: 1.1;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
         .header h1 span.red { color: var(--accent-red); }
-        .header .sub-brand { font-weight: 700; font-size: 20px; margin-top: 15px; }
+        .header .sub-brand { font-weight: 700; font-size: clamp(16px, 3vw, 20px); margin-top: 15px; }
 
-        .discount-bar { margin-bottom: 40px; display: flex; align-items: center; gap: 15px; font-size: 14px; }
-        .discount-bar input { padding: 8px; border: 1px solid var(--primary-green); border-radius: 4px; width: 60px; }
+        .discount-bar {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            width: 100%;
+        }
 
+        .discount-bar input {
+            padding: 8px;
+            border: 1px solid var(--primary-green);
+            border-radius: 4px;
+            width: 60px;
+        }
+
+        /* --- Optimized Responsive Grid --- */
         .calculator-grid {
             display: grid;
+            /* Default: 4 columns for Desktop */
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            width: 90%;
+            width: 95%;
             max-width: 1200px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        /* Tablet View: 2 columns */
+        @media (max-width: 1024px) {
+            .calculator-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Mobile View: 1 column */
+        @media (max-width: 600px) {
+            .calculator-grid { grid-template-columns: 1fr; }
+            .header h1 { text-align: left; }
+            .totals { flex-direction: column; gap: 20px !important; }
+            .send-btn { width: 100%; padding: 16px 20px; }
         }
 
         .column { display: flex; flex-direction: column; }
         .module-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); min-height: 80px; }
         .module-top { display: flex; align-items: center; cursor: pointer; }
         
-        .module-top input[type="checkbox"], .ob-toggle input {
-            width: 22px; height: 22px; margin-right: 15px; accent-color: var(--primary-green);
+        .module-top input[type="checkbox"], .ob-switch input {
+            width: 22px; height: 22px; margin-right: 15px; accent-color: var(--primary-green); flex-shrink: 0;
         }
 
         .module-name { font-weight: 700; font-size: 15px; color: var(--text-navy); }
@@ -57,21 +101,20 @@
         .qty-container.active { display: flex; align-items: center; gap: 10px; }
         .qty-container input, .ob-input { width: 80px; padding: 6px; border: 1px solid #ddd; border-radius: 4px; }
 
-        /* Onboarding Section */
+        /* --- Onboarding Section --- */
         .onboarding-section {
-            width: 90%;
+            width: 95%;
             max-width: 1200px;
             margin-top: 40px;
             padding: 30px;
             background: #f9fdfc;
             border-radius: 16px;
             border: 1px solid var(--border-color);
+            box-sizing: border-box;
         }
 
-        .ob-header { font-weight: 700; font-size: 18px; margin-bottom: 20px; color: var(--primary-green); display: flex; align-items: center; }
-
-        .ob-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; align-items: flex-end; }
-
+        .ob-header { font-weight: 700; font-size: 18px; margin-bottom: 20px; color: var(--primary-green); }
+        .ob-controls { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-end; }
         .ob-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; }
         
         .ob-badge {
@@ -82,22 +125,21 @@
             font-weight: 700;
             margin-top: 10px;
         }
-
         .badge-free { background: #e8f5e9; color: #2e7d32; }
         .badge-paid { background: #fff3e0; color: #ef6c00; }
 
-        .footer-cta { margin-top: 60px; text-align: center; }
-        .totals { display: flex; justify-content: center; gap: 60px; margin-bottom: 40px; }
+        /* --- Footer Totals & CTA --- */
+        .footer-cta { margin-top: 60px; width: 95%; max-width: 1200px; text-align: center; }
+        .totals { display: flex; justify-content: center; gap: clamp(20px, 8vw, 80px); margin-bottom: 40px; }
         .total-box h3 { font-size: 12px; opacity: 0.5; margin: 0; letter-spacing: 1px; }
-        .total-box p { font-size: 36px; font-weight: 700; margin: 5px 0; color: var(--primary-green); }
+        .total-box p { font-size: clamp(24px, 5vw, 36px); font-weight: 700; margin: 5px 0; color: var(--primary-green); }
 
         .send-btn {
-            background-color: var(--accent-red); color: white; border: none; padding: 16px 120px;
+            background-color: var(--accent-red); color: white; border: none; padding: 16px 80px;
             border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; gap: 15px; margin: 0 auto;
+            display: inline-flex; align-items: center; gap: 15px; transition: transform 0.2s;
         }
-
-        @media (max-width: 900px) { .calculator-grid { grid-template-columns: 1fr 1fr; } }
+        .send-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -153,7 +195,7 @@
         </div>
 
         <button class="send-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             Send Quote
         </button>
     </div>
@@ -190,6 +232,7 @@
             `;
             container.appendChild(item);
         });
+        calculate();
     }
 
     function toggle(i) {
@@ -206,59 +249,50 @@
         const discount = (parseFloat(document.getElementById('discount').value) || 0) / 100;
         let mrrTotal = 0;
 
-        // 1. Modules Calculation
         modules.forEach((mod, i) => {
             const isChecked = document.getElementById(`check-${i}`).checked;
             const qtyBox = document.getElementById(`qty-box-${i}`);
             if (isChecked) {
                 qtyBox.classList.add('active');
-                mrrTotal += (mod.cost * (parseFloat(document.getElementById(`qty-${i}`).value) || 0)) * (1 - discount);
+                const qty = parseFloat(document.getElementById(`qty-${i}`).value) || 0;
+                mrrTotal += (mod.cost * qty) * (1 - discount);
             } else {
                 qtyBox.classList.remove('active');
-                document.getElementById(`qty-${i}`).value = 0;
             }
         });
 
-        // 2. Onboarding Rules Calculation
         const emps = parseInt(document.getElementById('ob-employees').value) || 0;
         const hasIT = document.getElementById('ob-has-it').checked;
-        
         let obCost = 0;
-        let tierText = "N/A";
+        let tierText = "-";
         let note = "";
         let badgeClass = "badge-free";
 
         if (emps > 0) {
             if (emps < 100) {
                 if (hasIT) {
-                    // Rule 1: SMB + IT Person
                     tierText = "Self-Service SMB";
                     badgeClass = "badge-free";
                     note = "Free via Help Center";
                     obCost = 0;
                 } else {
-                    // Rule 2: SMB + No IT Person
                     tierText = "Expert Deployment";
                     badgeClass = "badge-paid";
                     note = "2h Expert Config & Deployment";
                     obCost = 200;
                 }
             } else {
-                // Rule 3: Mid-Market (100+)
                 tierText = "Enterprise Configuration";
                 badgeClass = "badge-paid";
-                
-                // 2 hours per 100 employees, €100/hour
                 const hours = Math.ceil(emps / 100) * 2;
                 obCost = hours * 100;
-                note = `${hours}h dedicated engineering (${euro.format(100)}/h)`;
+                note = `${hours}h dedicated engineering`;
             }
         }
 
-        // Update UI
         document.getElementById('ob-tier-name').innerText = tierText;
-        document.getElementById('ob-tier-badge').innerText = emps > 0 ? "Active" : "Enter Employees";
         document.getElementById('ob-tier-badge').className = `ob-badge ${badgeClass}`;
+        document.getElementById('ob-tier-badge').innerText = emps > 0 ? "Active" : "Select employees";
         document.getElementById('ob-pricing-note').innerText = note;
 
         document.getElementById('total-ob').innerText = euro.format(obCost);
