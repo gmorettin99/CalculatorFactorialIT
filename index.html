@@ -14,7 +14,7 @@
             --bg-light: #FFFFFF;
             --text-navy: #2C3E50;
             --border-color: #f0f0f0;
-            --unified-bg: #f2faf7; /* Unified light green background */
+            --unified-bg: #f2faf7; 
         }
 
         body {
@@ -79,10 +79,9 @@
             font-family: 'DM Sans';
         }
 
-        /* --- Unified Module Container --- */
         .unified-module-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4-column layout */
+            grid-template-columns: repeat(4, 1fr); 
             gap: 20px;
             width: 95%;
             max-width: 1200px;
@@ -94,7 +93,6 @@
 
         .column { display: flex; flex-direction: column; }
         
-        /* SentinelOne column specific alignment (Squashed) */
         .column-s1 .module-item {
             min-height: 60px;
             padding: 10px 0;
@@ -123,7 +121,6 @@
             font-family: 'DM Sans'; 
         }
 
-        /* --- Onboarding Section (White background) --- */
         .onboarding-section {
             width: 95%;
             max-width: 1200px;
@@ -150,7 +147,6 @@
         .badge-free { background: #e8f5e9; color: #2e7d32; }
         .badge-paid { background: #fff3e0; color: #ef6c00; }
 
-        /* --- Footer Totals --- */
         .footer-cta { margin-top: 50px; width: 95%; max-width: 1200px; text-align: center; padding-bottom: 60px; }
         .totals { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
         .total-box h3 { font-size: 12px; opacity: 0.5; margin: 0; letter-spacing: 1px; }
@@ -162,7 +158,6 @@
             display: inline-flex; align-items: center; gap: 15px;
         }
 
-        /* Responsiveness */
         @media (max-width: 1024px) {
             .unified-module-container { grid-template-columns: repeat(2, 1fr); }
         }
@@ -189,7 +184,11 @@
     </div>
 
     <div class="unified-module-container">
-        <div class="column" id="col-1"></div> <div class="column" id="col-2"></div> <div class="column" id="col-3"></div> <div class="column column-s1" id="col-4"></div> </div>
+        <div class="column" id="col-1"></div> 
+        <div class="column" id="col-2"></div> 
+        <div class="column" id="col-3"></div> 
+        <div class="column column-s1" id="col-4"></div> 
+    </div>
 
     <div class="onboarding-section">
         <div class="ob-header">Onboarding Configuration</div>
@@ -241,8 +240,10 @@
     ];
 
     const securityGroup = ["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"];
-    const mdmGroup = ["saas-mdm", "mdm-pc", "mdm-mobile"];
-    const saasGroup = ["saas-mdm", "saas"];
+    
+    // Adjusted exclusivity groups per user request
+    const saasConflicts = ["saas-mdm", "saas"];
+    const mdmPcConflicts = ["saas-mdm", "mdm-pc"];
 
     const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 
@@ -271,9 +272,18 @@
         if (event.target.type !== 'checkbox') checkbox.checked = !checkbox.checked;
 
         if (checkbox.checked) {
-            if (securityGroup.includes(id)) securityGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
-            if (mdmGroup.includes(id)) mdmGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
-            if (saasGroup.includes(id)) saasGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            // Rule 1: Security Mutually Exclusive
+            if (securityGroup.includes(id)) {
+                securityGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            }
+            // Rule 2: SaaS + MDM conflicts with SaaS
+            if (saasConflicts.includes(id)) {
+                saasConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            }
+            // Rule 3: SaaS + MDM conflicts with MDM Pc (NOT MDM Mobile)
+            if (mdmPcConflicts.includes(id)) {
+                mdmPcConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            }
         }
         calculate();
     }
