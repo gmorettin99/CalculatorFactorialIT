@@ -14,7 +14,7 @@
             --bg-light: #FFFFFF;
             --text-navy: #2C3E50;
             --border-color: #f0f0f0;
-            --s1-bg: #e2f3eb; /* Light green background for S1 column */
+            --module-bg: #f2faf7; /* Light green for the main module groups */
         }
 
         body {
@@ -69,7 +69,6 @@
             justify-content: center;
             gap: 15px;
             font-size: 14px;
-            width: 100%;
         }
 
         .discount-bar input {
@@ -80,28 +79,43 @@
             font-family: 'DM Sans';
         }
 
-        .calculator-grid {
+        /* --- Main Calculator Layout --- */
+        .calculator-wrapper {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: 3fr 1fr; /* 3 parts for main modules, 1 part for S1 */
             gap: 20px;
             width: 95%;
             max-width: 1200px;
-            padding: 0 10px;
             box-sizing: border-box;
+        }
+
+        /* Shared Background for SaaS, MDM, and ThreatDown */
+        .main-modules-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            background-color: var(--module-bg);
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        /* SentinelOne Column */
+        .column-s1 {
+            background-color: #e2f3eb; /* Slightly darker/distinct green for S1 */
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
         }
 
         .column { display: flex; flex-direction: column; }
         
-        /* Squashed SentinelOne Column */
-        .column-s1 {
-            background-color: var(--s1-bg);
-            border-radius: 16px;
-            padding: 10px 15px !important;
+        .module-item { 
+            padding: 12px 0; 
+            border-bottom: 1px solid rgba(66, 184, 145, 0.1); 
+            min-height: 70px; 
         }
 
-        .module-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); min-height: 80px; }
-        .column-s1 .module-item { min-height: 60px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        
         .module-top { display: flex; align-items: center; cursor: pointer; }
         .module-top input[type="checkbox"] {
             width: 22px; height: 22px; margin-right: 15px; accent-color: var(--primary-green); flex-shrink: 0;
@@ -111,15 +125,21 @@
 
         .qty-container { margin-top: 5px; padding-left: 37px; display: none; }
         .qty-container.active { display: flex; align-items: center; gap: 10px; }
-        .qty-container input { width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-family: 'DM Sans'; }
+        .qty-container input { 
+            width: 60px; 
+            padding: 4px; 
+            border: 1px solid var(--primary-green); 
+            border-radius: 4px; 
+            font-family: 'DM Sans'; 
+        }
 
-        /* Onboarding */
+        /* --- Onboarding Section (Kept outside the green background) --- */
         .onboarding-section {
             width: 95%;
             max-width: 1200px;
-            margin-top: 40px;
+            margin-top: 30px;
             padding: 30px;
-            background: #f9fdfc;
+            background: #fdfdfd;
             border-radius: 16px;
             border: 1px solid var(--border-color);
             box-sizing: border-box;
@@ -140,7 +160,8 @@
         .badge-free { background: #e8f5e9; color: #2e7d32; }
         .badge-paid { background: #fff3e0; color: #ef6c00; }
 
-        .footer-cta { margin-top: 60px; width: 95%; max-width: 1200px; text-align: center; padding-bottom: 60px; }
+        /* --- Footer Totals --- */
+        .footer-cta { margin-top: 50px; width: 95%; max-width: 1200px; text-align: center; padding-bottom: 60px; }
         .totals { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
         .total-box h3 { font-size: 12px; opacity: 0.5; margin: 0; letter-spacing: 1px; }
         .total-box p { font-size: clamp(24px, 5vw, 36px); font-weight: 700; margin: 5px 0; color: var(--primary-green); }
@@ -151,13 +172,14 @@
             display: inline-flex; align-items: center; gap: 15px;
         }
 
+        /* Responsiveness */
         @media (max-width: 1024px) {
-            .calculator-grid { grid-template-columns: repeat(2, 1fr); }
-            .column-s1 { margin-top: 20px; }
+            .calculator-wrapper { grid-template-columns: 1fr; }
+            .main-modules-container { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 600px) {
-            .calculator-grid { grid-template-columns: 1fr; }
+            .main-modules-container { grid-template-columns: 1fr; }
+            .totals { flex-direction: column; gap: 20px; }
         }
     </style>
 </head>
@@ -177,10 +199,10 @@
         <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
     </div>
 
-    <div class="calculator-grid">
-        <div class="column" id="col-1"></div>
-        <div class="column" id="col-2"></div>
-        <div class="column" id="col-3"></div>
+    <div class="calculator-wrapper">
+        <div class="main-modules-container">
+            <div class="column" id="col-1"></div> <div class="column" id="col-2"></div> <div class="column" id="col-3"></div> </div>
+
         <div class="column column-s1" id="col-4"></div>
     </div>
 
@@ -206,11 +228,11 @@
     <div class="footer-cta">
         <div class="totals">
             <div class="total-box">
-                <h3>ONBOARDING</h3>
+                <h3>ONBOARDING (ONE-TIME)</h3>
                 <p id="total-ob">0,00 €</p>
             </div>
             <div class="total-box">
-                <h3>MONTHLY (MRR)</h3>
+                <h3>MONTHLY TOTAL (MRR)</h3>
                 <p id="total-mrr">0,00 €</p>
             </div>
         </div>
@@ -233,7 +255,6 @@
         { id: "s1-vigilance", name: "SentinelOne Vigilance", cost: 10.4, col: 4 }
     ];
 
-    // Exclusivity Rules
     const securityGroup = ["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"];
     const mdmGroup = ["saas-mdm", "mdm-pc", "mdm-mobile"];
     const saasGroup = ["saas-mdm", "saas"];
@@ -262,30 +283,12 @@
 
     function handleExclusivity(id, index) {
         const checkbox = document.getElementById(`check-${index}`);
-        // Toggle the target checkbox if it wasn't triggered by the click directly
-        if (event.target.type !== 'checkbox') {
-            checkbox.checked = !checkbox.checked;
-        }
+        if (event.target.type !== 'checkbox') checkbox.checked = !checkbox.checked;
 
         if (checkbox.checked) {
-            // Rule 1: Security Mutually Exclusive
-            if (securityGroup.includes(id)) {
-                securityGroup.forEach(item_id => {
-                    if (item_id !== id) uncheckById(item_id);
-                });
-            }
-            // Rule 2: MDM Bundles
-            if (mdmGroup.includes(id)) {
-                mdmGroup.forEach(item_id => {
-                    if (item_id !== id) uncheckById(item_id);
-                });
-            }
-            // Rule 3: SaaS Bundles
-            if (saasGroup.includes(id)) {
-                saasGroup.forEach(item_id => {
-                    if (item_id !== id) uncheckById(item_id);
-                });
-            }
+            if (securityGroup.includes(id)) securityGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            if (mdmGroup.includes(id)) mdmGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            if (saasGroup.includes(id)) saasGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
         }
         calculate();
     }
@@ -325,11 +328,8 @@
 
         if (emps > 0) {
             if (emps < 100) {
-                if (hasIT) {
-                    tierText = "Self-Service SMB"; badgeClass = "badge-free"; note = "Free via Help Center"; obCost = 0;
-                } else {
-                    tierText = "Expert Deployment"; badgeClass = "badge-paid"; note = "2h Expert Deployment"; obCost = 200;
-                }
+                if (hasIT) { tierText = "Self-Service SMB"; badgeClass = "badge-free"; note = "Free via Help Center"; obCost = 0; }
+                else { tierText = "Expert Deployment"; badgeClass = "badge-paid"; note = "2h Expert Deployment"; obCost = 200; }
             } else {
                 tierText = "Enterprise Configuration"; badgeClass = "badge-paid";
                 const hours = Math.ceil(emps / 100) * 2;
