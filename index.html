@@ -29,7 +29,6 @@
             align-items: center;
         }
 
-        /* --- Utility Brand Header --- */
         .utility-header {
             width: 100%;
             max-width: 1200px;
@@ -47,7 +46,6 @@
             text-transform: uppercase;
         }
 
-        /* --- Hero Section --- */
         .header {
             text-align: center;
             margin-bottom: 50px;
@@ -65,7 +63,6 @@
         .header h1 span.pink { color: var(--factorial-pink); }
         .header .sub-brand { font-weight: 700; font-size: 20px; margin-top: 15px; }
 
-        /* --- Discount Controls --- */
         .config-section {
             margin-bottom: 40px;
             display: flex;
@@ -83,7 +80,6 @@
             font-family: 'DM Sans';
         }
 
-        /* --- Main Selection Grid --- */
         .unified-module-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr); 
@@ -104,8 +100,8 @@
         }
 
         .module-top { display: flex; align-items: center; cursor: pointer; }
-        .module-top input[type="checkbox"] { 
-            width: 20px; height: 20px; margin-right: 12px; accent-color: var(--factorial-pink); flex-shrink: 0; 
+        .module-top input[type="checkbox"], .request-item input { 
+            width: 18px; height: 18px; margin-right: 12px; accent-color: var(--factorial-pink); flex-shrink: 0; 
         }
 
         .module-name { font-weight: 700; font-size: 14px; color: var(--text-dark); }
@@ -117,7 +113,6 @@
         }
         .qty-container label { font-size: 11px; opacity: 0.6; }
 
-        /* --- Footer Professional Grid --- */
         .footer-grid {
             display: grid;
             grid-template-columns: 1.2fr 1fr 0.8fr;
@@ -148,29 +143,29 @@
             padding-bottom: 10px;
         }
 
-        /* --- Recap List --- */
-        .recap-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
-        .recap-item { 
-            display: flex; justify-content: space-between; 
-            padding: 10px 0; border-bottom: 1px solid #f5f5f5; 
-            font-size: 14px; font-weight: 500;
-        }
+        /* Recap & OB Tables */
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table td { padding: 8px 0; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f5f5f5; }
+        .summary-table .val { text-align: right; }
 
-        /* --- Totals Display --- */
+        /* Additional Requests List */
+        .requests-container { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-muted); }
+        .requests-container h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; opacity: 0.6; }
+        .request-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
+        .request-item span { opacity: 0.8; }
+
         .totals-block { margin-top: 20px; }
         .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .total-row span { font-size: 12px; font-weight: 700; opacity: 0.6; }
         .total-row strong { font-size: 22px; color: var(--factorial-pink); }
 
-        /* --- Price Menu --- */
         .price-item { 
             display: flex; justify-content: space-between; 
             font-size: 12px; padding: 6px 0; opacity: 0.8;
         }
 
-        /* --- Onboarding Controls --- */
-        .ob-control-group { display: flex; flex-direction: column; gap: 15px; }
-        .ob-row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+        .ob-input-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
+        .ob-input-row input[type="number"] { width: 65px; padding: 6px; border: 1px solid var(--border-muted); border-radius: 4px; }
 
         @media (max-width: 1000px) {
             .footer-grid { grid-template-columns: 1fr; }
@@ -191,7 +186,7 @@
 
     <div class="config-section">
         <label>Global Discount (%)</label>
-        <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
+        <input type="number" id="discount" value="0" min="0" max="30" oninput="calculate()">
     </div>
 
     <div class="unified-module-container">
@@ -203,27 +198,53 @@
 
     <div class="footer-grid">
         <div class="formal-card">
-            <div class="card-title">Onboarding Services</div>
-            <div class="ob-control-group">
-                <div class="ob-row">
-                    <label style="width: 120px;">Employees</label>
-                    <input type="number" id="ob-employees" value="0" min="0" style="width:70px; padding:8px; border:1px solid var(--border-muted); border-radius:4px;" oninput="calculate()">
+            <div class="card-title">Onboarding Selection</div>
+            <div class="ob-input-row">
+                <label>Company Employees</label>
+                <input type="number" id="ob-employees" value="0" min="0" oninput="calculate()">
+            </div>
+            <div class="ob-input-row" style="cursor:pointer;" onclick="toggleIT()">
+                <input type="checkbox" id="ob-has-it" onchange="calculate()" style="width:18px; height:18px; accent-color:var(--factorial-pink);">
+                <label>Has internal IT Person</label>
+            </div>
+            
+            <table class="summary-table" style="margin-top:10px;">
+                <tr>
+                    <td>Service Tier</td>
+                    <td class="val" id="ob-tier-name" style="color:var(--primary-green); font-weight:700;">-</td>
+                </tr>
+                <tr>
+                    <td>Scope</td>
+                    <td class="val" id="ob-tier-scope">-</td>
+                </tr>
+            </table>
+
+            <div class="requests-container">
+                <h4>Additional Requests</h4>
+                <div class="request-item">
+                    <input type="checkbox" id="req-1">
+                    <span>Active Directory / Google Workspace Sync</span>
                 </div>
-                <div class="ob-row" style="cursor:pointer;" onclick="toggleIT()">
-                    <input type="checkbox" id="ob-has-it" onchange="calculate()" style="width:18px; height:18px; accent-color:var(--factorial-pink);">
-                    <label>Internal IT Person Present</label>
+                <div class="request-item">
+                    <input type="checkbox" id="req-2">
+                    <span>Legacy Data Migration Support</span>
                 </div>
-                <div id="ob-details" style="margin-top:10px; font-size:13px; font-weight:700;">
-                    <div id="ob-tier-name" style="color:var(--factorial-pink);">-</div>
-                    <div id="ob-pricing-note" style="opacity:0.6; font-weight:400; margin-top:4px;"></div>
+                <div class="request-item">
+                    <input type="checkbox" id="req-3">
+                    <span>Custom Policy Configuration (VIPs)</span>
+                </div>
+                <div class="request-item">
+                    <input type="checkbox" id="req-4">
+                    <span>On-site Employee Training Session</span>
                 </div>
             </div>
         </div>
 
         <div class="formal-card">
             <div class="card-title">Selection Summary</div>
-            <div class="recap-list" id="recap-list">
-                <div style="opacity:0.4; font-size:13px;">No items selected...</div>
+            <div id="recap-container" style="flex-grow:1;">
+                <table class="summary-table" id="recap-list">
+                    </table>
             </div>
             <div class="totals-block">
                 <div class="total-row">
@@ -283,7 +304,6 @@
                 </div>
             `;
             container.appendChild(item);
-
             priceList.innerHTML += `<div class="price-item"><span>${mod.name}</span><strong>${euro.format(mod.cost)}</strong></div>`;
         });
         calculate();
@@ -312,7 +332,10 @@
 
     function calculate() {
         let discount = parseFloat(document.getElementById('discount').value) || 0;
-        if (discount > 30) discount = 30; 
+        if (discount > 30) {
+            discount = 30;
+            document.getElementById('discount').value = 30;
+        }
         const discountMultiplier = (100 - discount) / 100;
 
         let mrrTotal = 0;
@@ -328,33 +351,40 @@
                 const cost = (mod.cost * qty) * discountMultiplier;
                 mrrTotal += cost;
                 if (qty > 0) {
-                    recap.innerHTML += `<div class="recap-item"><span>${qty}x ${mod.name}</span><strong>${euro.format(cost)}</strong></div>`;
+                    recap.innerHTML += `<tr><td>${qty}x ${mod.name}</td><td class="val">${euro.format(cost)}</td></tr>`;
                 }
             } else {
                 qtyBox.classList.remove('active');
             }
         });
 
-        if (recap.innerHTML === "") recap.innerHTML = `<div style="opacity:0.4; font-size:13px;">No items selected...</div>`;
+        if (recap.innerHTML === "") recap.innerHTML = `<tr><td colspan="2" style="opacity:0.4; text-align:center;">No items selected</td></tr>`;
 
         const emps = parseInt(document.getElementById('ob-employees').value) || 0;
         const hasIT = document.getElementById('ob-has-it').checked;
-        let obCost = 0, tier = "-", note = "";
+        let obCost = 0, tier = "-", scope = "-";
 
         if (emps > 0) {
             if (emps < 100) {
-                if (hasIT) { tier = "Self-Service Onboarding"; note = "Complimentary access to Help Center"; obCost = 0; }
-                else { tier = "Guided SMB Deployment"; note = "2h Expert Configuration"; obCost = 200; }
+                if (hasIT) {
+                    tier = "Self-Service Onboarding";
+                    scope = "Help Center & Documentation";
+                    obCost = 0;
+                } else {
+                    tier = "Guided SMB Deployment";
+                    scope = "2h Expert Configuration";
+                    obCost = 200;
+                }
             } else {
                 tier = "Mid-Market Configuration"; 
                 const hours = Math.ceil(emps / 100) * 2;
+                scope = `${hours}h Implementation`;
                 obCost = hours * 100;
-                note = `${hours}h Implementation Engineering`;
             }
         }
 
         document.getElementById('ob-tier-name').innerText = tier;
-        document.getElementById('ob-pricing-note').innerText = note;
+        document.getElementById('ob-tier-scope').innerText = scope;
         document.getElementById('total-ob').innerText = euro.format(obCost);
         document.getElementById('total-mrr').innerText = euro.format(mrrTotal);
     }
