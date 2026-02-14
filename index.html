@@ -79,6 +79,13 @@
             font-family: 'DM Sans';
         }
 
+        .discount-hint {
+            font-size: 11px;
+            color: var(--accent-red);
+            margin-top: 4px;
+            display: none;
+        }
+
         .unified-module-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr); 
@@ -179,8 +186,11 @@
     </div>
 
     <div class="discount-bar">
-        <label>Global Discount (%)</label>
-        <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <label>Global Discount (%)</label>
+            <input type="number" id="discount" value="0" min="0" max="100" oninput="calculate()">
+            <span id="discount-limit-msg" class="discount-hint">Max discount is 30%</span>
+        </div>
     </div>
 
     <div class="unified-module-container">
@@ -240,8 +250,6 @@
     ];
 
     const securityGroup = ["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"];
-    
-    // Adjusted exclusivity groups per user request
     const saasConflicts = ["saas-mdm", "saas"];
     const mdmPcConflicts = ["saas-mdm", "mdm-pc"];
 
@@ -272,18 +280,9 @@
         if (event.target.type !== 'checkbox') checkbox.checked = !checkbox.checked;
 
         if (checkbox.checked) {
-            // Rule 1: Security Mutually Exclusive
-            if (securityGroup.includes(id)) {
-                securityGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
-            }
-            // Rule 2: SaaS + MDM conflicts with SaaS
-            if (saasConflicts.includes(id)) {
-                saasConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
-            }
-            // Rule 3: SaaS + MDM conflicts with MDM Pc (NOT MDM Mobile)
-            if (mdmPcConflicts.includes(id)) {
-                mdmPcConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
-            }
+            if (securityGroup.includes(id)) securityGroup.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            if (saasConflicts.includes(id)) saasConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
+            if (mdmPcConflicts.includes(id)) mdmPcConflicts.forEach(item_id => { if (item_id !== id) uncheckById(item_id); });
         }
         calculate();
     }
@@ -299,7 +298,18 @@
     }
 
     function calculate() {
-        const discount = (parseFloat(document.getElementById('discount').value) || 0) / 100;
+        let inputDiscount = parseFloat(document.getElementById('discount').value) || 0;
+        const limitMsg = document.getElementById('discount-limit-msg');
+
+        // Apply 30% Max Roof Logic
+        if (inputDiscount > 30) {
+            inputDiscount = 30;
+            limitMsg.style.display = 'block';
+        } else {
+            limitMsg.style.display = 'none';
+        }
+
+        const discountMultiplier = (100 - inputDiscount) / 100;
         let mrrTotal = 0;
 
         modules.forEach((mod, i) => {
@@ -308,7 +318,7 @@
             if (isChecked) {
                 qtyBox.classList.add('active');
                 const qty = parseFloat(document.getElementById(`qty-${i}`).value) || 0;
-                mrrTotal += (mod.cost * qty) * (1 - discount);
+                mrrTotal += (mod.cost * qty) * discountMultiplier;
             } else {
                 qtyBox.classList.remove('active');
             }
