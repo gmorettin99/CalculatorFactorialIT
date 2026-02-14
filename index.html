@@ -203,7 +203,7 @@
 
     <div class="footer-grid">
         <div class="formal-card">
-            <div class="card-title">I. Onboarding Services</div>
+            <div class="card-title">Onboarding Services</div>
             <div class="ob-control-group">
                 <div class="ob-row">
                     <label style="width: 120px;">Employees</label>
@@ -221,7 +221,7 @@
         </div>
 
         <div class="formal-card">
-            <div class="card-title">II. Selection Summary</div>
+            <div class="card-title">Selection Summary</div>
             <div class="recap-list" id="recap-list">
                 <div style="opacity:0.4; font-size:13px;">No items selected...</div>
             </div>
@@ -238,7 +238,7 @@
         </div>
 
         <div class="formal-card">
-            <div class="card-title">III. List Prices</div>
+            <div class="card-title">List Prices</div>
             <div id="price-menu-list">
                 </div>
             <div style="margin-top:auto; padding-top:15px; font-size:10px; opacity:0.5; text-align:center;">
@@ -269,7 +269,6 @@
     function init() {
         const priceList = document.getElementById('price-menu-list');
         modules.forEach((mod, i) => {
-            // Main Grid
             const container = document.getElementById(`col-${mod.col}`);
             const item = document.createElement('div');
             item.className = 'module-item';
@@ -285,7 +284,6 @@
             `;
             container.appendChild(item);
 
-            // Reference Price List
             priceList.innerHTML += `<div class="price-item"><span>${mod.name}</span><strong>${euro.format(mod.cost)}</strong></div>`;
         });
         calculate();
@@ -314,7 +312,7 @@
 
     function calculate() {
         let discount = parseFloat(document.getElementById('discount').value) || 0;
-        if (discount > 30) discount = 30; // 30% Roof
+        if (discount > 30) discount = 30; 
         const discountMultiplier = (100 - discount) / 100;
 
         let mrrTotal = 0;
@@ -339,7 +337,6 @@
 
         if (recap.innerHTML === "") recap.innerHTML = `<div style="opacity:0.4; font-size:13px;">No items selected...</div>`;
 
-        // Onboarding Tier Logic
         const emps = parseInt(document.getElementById('ob-employees').value) || 0;
         const hasIT = document.getElementById('ob-has-it').checked;
         let obCost = 0, tier = "-", note = "";
