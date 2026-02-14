@@ -143,16 +143,25 @@
             padding-bottom: 10px;
         }
 
-        /* Recap & OB Tables */
         .summary-table { width: 100%; border-collapse: collapse; }
         .summary-table td { padding: 8px 0; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f5f5f5; }
         .summary-table .val { text-align: right; }
 
-        /* Additional Requests List */
         .requests-container { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-muted); }
-        .requests-container h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; opacity: 0.6; }
+        .requests-container h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; opacity: 0.6; letter-spacing: 0.5px; }
         .request-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
         .request-item span { opacity: 0.8; }
+        
+        .other-input {
+            width: 100%;
+            margin-top: 5px;
+            padding: 6px;
+            border: 1px solid var(--border-muted);
+            border-radius: 4px;
+            font-family: 'DM Sans';
+            font-size: 12px;
+            display: none;
+        }
 
         .totals-block { margin-top: 20px; }
         .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -176,7 +185,7 @@
 <body>
 
     <div class="utility-header">
-        <div class="utility-text">Factorial IT / Professional Calculator</div>
+        <div class="utility-text">Factorial IT / Package Calculator</div>
     </div>
 
     <div class="header">
@@ -200,55 +209,55 @@
         <div class="formal-card">
             <div class="card-title">Onboarding Selection</div>
             <div class="ob-input-row">
-                <label>Company Employees</label>
-                <input type="number" id="ob-employees" value="0" min="0" oninput="calculate()">
+                <label>Company Size</label>
+                <input type="number" id="ob-employees" value="0" min="0" oninput="calculate()" placeholder="Qty">
             </div>
             <div class="ob-input-row" style="cursor:pointer;" onclick="toggleIT()">
                 <input type="checkbox" id="ob-has-it" onchange="calculate()" style="width:18px; height:18px; accent-color:var(--factorial-pink);">
-                <label>Has internal IT Person</label>
+                <label>Internal IT Managed</label>
             </div>
             
             <table class="summary-table" style="margin-top:10px;">
                 <tr>
-                    <td>Service Tier</td>
+                    <td>Service Level</td>
                     <td class="val" id="ob-tier-name" style="color:var(--primary-green); font-weight:700;">-</td>
                 </tr>
                 <tr>
-                    <td>Scope</td>
+                    <td>Engagement</td>
                     <td class="val" id="ob-tier-scope">-</td>
                 </tr>
             </table>
 
             <div class="requests-container">
-                <h4>Additional Requests</h4>
+                <h4>Additional Setup Requirements</h4>
                 <div class="request-item">
                     <input type="checkbox" id="req-1">
-                    <span>Active Directory / Google Workspace Sync</span>
+                    <span>Custom HR Integration Set up</span>
                 </div>
                 <div class="request-item">
                     <input type="checkbox" id="req-2">
-                    <span>Legacy Data Migration Support</span>
+                    <span>Multi-country Set up</span>
                 </div>
                 <div class="request-item">
                     <input type="checkbox" id="req-3">
-                    <span>Custom Policy Configuration (VIPs)</span>
+                    <span>Platform Enablement Course</span>
                 </div>
-                <div class="request-item">
-                    <input type="checkbox" id="req-4">
-                    <span>On-site Employee Training Session</span>
+                <div class="request-item" onclick="toggleOther()">
+                    <input type="checkbox" id="req-other">
+                    <span>Other</span>
                 </div>
+                <input type="text" id="other-text" class="other-input" placeholder="Specify requirement...">
             </div>
         </div>
 
         <div class="formal-card">
             <div class="card-title">Selection Summary</div>
             <div id="recap-container" style="flex-grow:1;">
-                <table class="summary-table" id="recap-list">
-                    </table>
+                <table class="summary-table" id="recap-list"></table>
             </div>
             <div class="totals-block">
                 <div class="total-row">
-                    <span>One-Time Set Up</span>
+                    <span>One-Time Implementation</span>
                     <strong id="total-ob">0,00 €</strong>
                 </div>
                 <div class="total-row">
@@ -259,11 +268,10 @@
         </div>
 
         <div class="formal-card">
-            <div class="card-title">List Prices</div>
-            <div id="price-menu-list">
-                </div>
+            <div class="card-title">Price List</div>
+            <div id="price-menu-list"></div>
             <div style="margin-top:auto; padding-top:15px; font-size:10px; opacity:0.5; text-align:center;">
-                *Prices per user / month before discounts
+                *List price per user / month
             </div>
         </div>
     </div>
@@ -299,7 +307,7 @@
                     <span class="module-name">${mod.name}</span>
                 </div>
                 <div class="qty-container" id="qty-box-${i}">
-                    <label>licenses:</label>
+                    <label>Qty:</label>
                     <input type="number" id="qty-${i}" value="0" min="0" oninput="calculate()">
                 </div>
             `;
@@ -307,6 +315,12 @@
             priceList.innerHTML += `<div class="price-item"><span>${mod.name}</span><strong>${euro.format(mod.cost)}</strong></div>`;
         });
         calculate();
+    }
+
+    function toggleOther() {
+        const check = document.getElementById('req-other');
+        const input = document.getElementById('other-text');
+        input.style.display = check.checked ? 'block' : 'none';
     }
 
     function handleExclusivity(id, index) {
@@ -332,10 +346,7 @@
 
     function calculate() {
         let discount = parseFloat(document.getElementById('discount').value) || 0;
-        if (discount > 30) {
-            discount = 30;
-            document.getElementById('discount').value = 30;
-        }
+        if (discount > 30) { discount = 30; document.getElementById('discount').value = 30; }
         const discountMultiplier = (100 - discount) / 100;
 
         let mrrTotal = 0;
@@ -353,12 +364,10 @@
                 if (qty > 0) {
                     recap.innerHTML += `<tr><td>${qty}x ${mod.name}</td><td class="val">${euro.format(cost)}</td></tr>`;
                 }
-            } else {
-                qtyBox.classList.remove('active');
-            }
+            } else { qtyBox.classList.remove('active'); }
         });
 
-        if (recap.innerHTML === "") recap.innerHTML = `<tr><td colspan="2" style="opacity:0.4; text-align:center;">No items selected</td></tr>`;
+        if (recap.innerHTML === "") recap.innerHTML = `<tr><td colspan="2" style="opacity:0.4; text-align:center;">No licenses selected</td></tr>`;
 
         const emps = parseInt(document.getElementById('ob-employees').value) || 0;
         const hasIT = document.getElementById('ob-has-it').checked;
@@ -368,17 +377,22 @@
             if (emps < 100) {
                 if (hasIT) {
                     tier = "Self-Service Onboarding";
-                    scope = "Help Center & Documentation";
+                    scope = "Documentation Guided";
                     obCost = 0;
                 } else {
-                    tier = "Guided SMB Deployment";
-                    scope = "2h Expert Configuration";
+                    tier = "Scale-up Deployment";
+                    scope = "2h Configuration Session";
                     obCost = 200;
                 }
-            } else {
-                tier = "Mid-Market Configuration"; 
+            } else if (emps >= 100 && emps <= 499) {
+                tier = "Scale-up Configuration"; 
                 const hours = Math.ceil(emps / 100) * 2;
-                scope = `${hours}h Implementation`;
+                scope = `${hours}h Expert Implementation`;
+                obCost = hours * 100;
+            } else {
+                tier = "Enterprise Implementation";
+                const hours = Math.ceil(emps / 100) * 2;
+                scope = `${hours}h Full-Service Setup`;
                 obCost = hours * 100;
             }
         }
