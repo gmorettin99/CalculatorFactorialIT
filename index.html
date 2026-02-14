@@ -53,8 +53,8 @@
         .qty-container input { width: 60px; padding: 6px; border: 1px solid var(--border-muted); border-radius: 4px; }
 
         .footer-grid {
-            display: grid; grid-template-columns: 1.2fr 1fr 0.8fr; gap: 30px;
-            width: 95%; max-width: 1200px; margin: 40px 0 20px 0;
+            display: grid; grid-template-columns: 1.2fr 1.3fr 0.7fr; gap: 30px;
+            width: 95%; max-width: 1250px; margin: 40px 0 20px 0;
         }
 
         .formal-card {
@@ -68,22 +68,19 @@
         }
 
         .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table td { padding: 8px 0; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f5f5f5; }
+        .summary-table td, .summary-table th { padding: 8px 4px; font-size: 12px; font-weight: 500; border-bottom: 1px solid #f5f5f5; text-align: left;}
         .summary-table .val { text-align: right; }
+        .summary-table .qty-col { width: 40px; color: var(--primary-green); font-weight: 700; }
 
         .requests-container { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-muted); }
         .request-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; cursor: pointer;}
-        .request-item span { opacity: 0.8; }
         .other-input, .it-team-input { width: 100%; margin-top: 5px; padding: 6px; border: 1px solid var(--border-muted); border-radius: 4px; display: none; font-family: 'DM Sans'; font-size: 12px; }
 
         .totals-block { margin-top: auto; padding-top: 20px; }
         .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .total-row span { font-size: 11px; font-weight: 700; opacity: 0.6; }
-        .total-row strong { font-size: 20px; color: var(--text-dark); }
+        .total-row strong { font-size: 18px; color: var(--text-dark); }
         .total-row.highlight strong { color: var(--factorial-pink); font-size: 24px; }
-        .total-row.discount-line span { color: var(--primary-green); opacity: 1; }
-
-        .ob-input-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
 
         .done-btn-container { width: 100%; display: flex; justify-content: center; margin-bottom: 80px; }
         .done-btn {
@@ -93,15 +90,14 @@
         }
         .done-btn:hover { transform: scale(1.1); background-color: var(--factorial-pink); }
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1100px) {
             .footer-grid { grid-template-columns: 1fr; }
-            .unified-module-container { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
 <body>
 
-    <div class="utility-header"><div class="utility-text">Factorial IT / Package Calculator</div></div>
+    <div class="utility-header"><div class="utility-text">Factorial IT / Professional Quote Tool</div></div>
 
     <div class="header">
         <h1>IT operations in <span class="pink">autopilot</span> &<br>enterprise-grade <span class="pink">security</span><br>connected to HR data</h1>
@@ -117,53 +113,57 @@
         <div class="column" id="col-1"></div><div class="column" id="col-2"></div><div class="column" id="col-3"></div><div class="column" id="col-4"></div>
     </div>
 
-    <div class="footer-grid" id="export-ui">
+    <div class="footer-grid">
         <div class="formal-card">
             <div class="card-title">Onboarding Selection</div>
-            <div class="ob-input-row">
-                <label>Company Size</label>
-                <input type="number" id="ob-employees" value="0" min="0" oninput="calculate()" placeholder="Qty">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label style="font-size:13px; font-weight:500;">Size:</label>
+                    <input type="number" id="ob-employees" value="0" min="0" oninput="calculate()" style="width:60px; padding:4px;">
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="ob-has-it" onchange="toggleITTeamInput()">
+                    <label style="font-size:13px; cursor:pointer;" for="ob-has-it">Internal IT Managed</label>
+                </div>
+                <input type="number" id="it-team-size" class="it-team-input" placeholder="IT Team Size" oninput="calculate()">
             </div>
-            <div class="ob-input-row">
-                <input type="checkbox" id="ob-has-it" onchange="toggleITTeamInput()">
-                <label style="cursor:pointer;" for="ob-has-it">Internal IT Managed</label>
-            </div>
-            <input type="number" id="it-team-size" class="it-team-input" placeholder="Size of IT Team" oninput="calculate()">
             
-            <table class="summary-table" style="margin-top:10px;">
-                <tr><td>Service Level</td><td class="val" id="ob-tier-name" style="color:var(--primary-green); font-weight:700;">-</td></tr>
-                <tr><td>Engagement</td><td class="val" id="ob-tier-scope">-</td></tr>
-                <tr style="border-top: 2px solid var(--border-muted);">
-                    <td style="font-weight:700;">Set Up Cost</td>
-                    <td class="val"><strong id="total-ob" style="color:var(--factorial-pink); font-size:16px;">0,00 €</strong></td>
-                </tr>
+            <table class="summary-table" style="margin-top:20px;">
+                <tr><td>Tier</td><td class="val" id="ob-tier-name" style="color:var(--primary-green); font-weight:700;">-</td></tr>
+                <tr><td>Setup Cost</td><td class="val"><strong id="total-ob" style="color:var(--factorial-pink);">0,00 €</strong></td></tr>
             </table>
 
             <div class="requests-container">
-                <h4 style="font-size:11px; opacity:0.6; text-transform:uppercase; margin-bottom:10px;">Setup Requirements</h4>
-                <div class="request-item"><input type="checkbox" class="add-req" id="req-1" onchange="calculate()"> <span>Custom HR Integration</span></div>
-                <div class="request-item"><input type="checkbox" class="add-req" id="req-2" onchange="calculate()"> <span>Multi-country Set up</span></div>
-                <div class="request-item"><input type="checkbox" class="add-req" id="req-3" onchange="calculate()"> <span>Platform Enablement</span></div>
+                <h4 style="font-size:10px; opacity:0.5; margin-bottom:10px;">REQUESTS</h4>
+                <div class="request-item"><input type="checkbox" class="add-req" id="req-1" onchange="calculate()"> <span>Custom HR Sync</span></div>
+                <div class="request-item"><input type="checkbox" class="add-req" id="req-2" onchange="calculate()"> <span>Multi-country</span></div>
+                <div class="request-item"><input type="checkbox" class="add-req" id="req-3" onchange="calculate()"> <span>Enablement</span></div>
                 <div class="request-item" onclick="toggleOther()"><input type="checkbox" class="add-req" id="req-other" onchange="calculate()"> <span>Other</span></div>
-                <input type="text" id="other-text" class="other-input" placeholder="Specify requirement..." oninput="calculate()">
+                <input type="text" id="other-text" class="other-input" placeholder="Specify..." oninput="calculate()">
             </div>
         </div>
 
         <div class="formal-card">
             <div class="card-title">Selection Summary</div>
-            <div style="flex-grow:1;"><table class="summary-table" id="recap-list"></table></div>
+            <table class="summary-table">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-muted);">
+                        <th class="qty-col">Qty</th>
+                        <th>License Item</th>
+                        <th class="val">Cost</th>
+                    </tr>
+                </thead>
+                <tbody id="recap-list"></tbody>
+            </table>
             <div class="totals-block">
-                <div id="discount-display" class="total-row discount-line" style="display:none;">
-                    <span>Discount Savings</span>
-                    <strong id="discount-amount" style="color:var(--primary-green);">- 0,00 €</strong>
+                <div class="total-row" id="disc-row" style="display:none; color:var(--primary-green);">
+                    <span>Discount Applied</span><strong id="disc-val" style="color:var(--primary-green);">0,00 €</strong>
                 </div>
                 <div class="total-row highlight">
-                    <span>Total Cost (Monthly)</span>
-                    <strong id="total-mrr">0,00 €</strong>
+                    <span>Total Cost (Monthly)</span><strong id="total-mrr">0,00 €</strong>
                 </div>
-                <div class="total-row" style="border-top: 1px solid var(--border-muted); padding-top:8px;">
-                    <span>Annual Commitment</span>
-                    <strong id="total-annual">0,00 €</strong>
+                <div class="total-row" style="border-top: 1px solid var(--border-muted); padding-top:10px;">
+                    <span>Annual Total</span><strong id="total-annual">0,00 €</strong>
                 </div>
             </div>
         </div>
@@ -175,7 +175,7 @@
     </div>
 
     <div class="done-btn-container">
-        <button class="done-btn" onclick="exportToSVGText()" title="Export SVG Code">
+        <button class="done-btn" onclick="exportToSVGText()">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </button>
     </div>
@@ -196,53 +196,33 @@
     const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 
     function init() {
-        const priceList = document.getElementById('price-menu-list');
+        const pl = document.getElementById('price-menu-list');
         modules.forEach((mod, i) => {
             const container = document.getElementById(`col-${mod.col}`);
             const item = document.createElement('div');
             item.className = 'module-item';
-            item.innerHTML = `
-                <div class="module-top" onclick="handleExclusivity('${mod.id}', ${i})">
-                    <input type="checkbox" id="check-${i}" onclick="event.stopPropagation(); handleExclusivity('${mod.id}', ${i})">
-                    <span class="module-name">${mod.name}</span>
-                </div>
-                <div class="qty-container" id="qty-box-${i}"><label>Qty:</label><input type="number" id="qty-${i}" value="0" oninput="calculate()"></div>
-            `;
+            item.innerHTML = `<div class="module-top" onclick="handleExcl('${mod.id}', ${i})"><input type="checkbox" id="check-${i}" onclick="event.stopProp(); handleExcl('${mod.id}', ${i})"><span class="module-name">${mod.name}</span></div><div class="qty-container" id="qty-box-${i}"><label>Qty:</label><input type="number" id="qty-${i}" value="0" oninput="calculate()"></div>`;
             container.appendChild(item);
-            priceList.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:12px; padding:6px 0; opacity:0.8;"><span>${mod.name}</span><strong>${euro.format(mod.cost)}</strong></div>`;
+            pl.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:11px; padding:4px 0; border-bottom:1px dotted #eee;"><span>${mod.name}</span><strong>${euro.format(mod.cost)}</strong></div>`;
         });
         calculate();
     }
 
-    function toggleITTeamInput() {
-        const hasIT = document.getElementById('ob-has-it').checked;
-        document.getElementById('it-team-size').style.display = hasIT ? 'block' : 'none';
-        calculate();
-    }
-
-    function toggleOther() {
-        const check = document.getElementById('req-other');
-        document.getElementById('other-text').style.display = check.checked ? 'block' : 'none';
-        calculate();
-    }
-
-    function handleExclusivity(id, index) {
-        const checkbox = document.getElementById(`check-${index}`);
-        if (event.target.type !== 'checkbox') checkbox.checked = !checkbox.checked;
-        const groups = [["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"], ["saas-mdm", "saas"], ["saas-mdm", "mdm-pc"]];
-        if (checkbox.checked) {
-            groups.forEach(g => { if(g.includes(id)) g.forEach(item => { if(item !== id) { const idx = modules.findIndex(m => m.id === item); if(idx !== -1) document.getElementById(`check-${idx}`).checked = false; }})});
-        }
+    function toggleITTeamInput() { document.getElementById('it-team-size').style.display = document.getElementById('ob-has-it').checked ? 'block' : 'none'; calculate(); }
+    function toggleOther() { document.getElementById('other-text').style.display = document.getElementById('req-other').checked ? 'block' : 'none'; calculate(); }
+    
+    function handleExcl(id, idx) {
+        const cb = document.getElementById(`check-${idx}`);
+        if (event.target.type !== 'checkbox') cb.checked = !cb.checked;
+        const gs = [["s1-control", "s1-complete", "s1-vigilance", "td-edr", "td-mdr"], ["saas-mdm", "saas"], ["saas-mdm", "mdm-pc"]];
+        if (cb.checked) gs.forEach(g => { if(g.includes(id)) g.forEach(it => { if(it !== id) { const mi = modules.findIndex(m => m.id === it); if(mi !== -1) document.getElementById(`check-${mi}`).checked = false; }})});
         calculate();
     }
 
     function calculate() {
-        let discountPct = Math.min(parseFloat(document.getElementById('discount').value) || 0, 30);
-        if (discountPct > 30) { discountPct = 30; document.getElementById('discount').value = 30; }
-        
-        const mult = (100 - discountPct) / 100;
-        let mrrBase = 0;
-        let mrrDiscounted = 0;
+        let disc = Math.min(parseFloat(document.getElementById('discount').value) || 0, 30);
+        const mult = (100 - disc) / 100;
+        let mrrBase = 0, mrrDisc = 0;
         const recap = document.getElementById('recap-list');
         recap.innerHTML = "";
 
@@ -250,80 +230,99 @@
             const isChecked = document.getElementById(`check-${i}`).checked;
             document.getElementById(`qty-box-${i}`).classList.toggle('active', isChecked);
             if (isChecked) {
-                const qty = parseInt(document.getElementById(`qty-${i}`).value) || 0;
-                const baseCost = mod.cost * qty;
-                const discountedCost = baseCost * mult;
-                mrrBase += baseCost;
-                mrrDiscounted += discountedCost;
-                if (qty > 0) recap.innerHTML += `<tr><td>${qty}x ${mod.name}</td><td class="val">${euro.format(discountedCost)}</td></tr>`;
+                const q = parseInt(document.getElementById(`qty-${i}`).value) || 0;
+                mrrBase += (mod.cost * q);
+                const c = (mod.cost * q) * mult;
+                mrrDisc += c;
+                if (q > 0) recap.innerHTML += `<tr><td class="qty-col">${q}</td><td>${mod.name}</td><td class="val">${euro.format(c)}</td></tr>`;
             }
         });
 
-        // Discount Line Logic
-        const discountDisplay = document.getElementById('discount-display');
-        const discountAmt = mrrBase - mrrDiscounted;
-        if (discountPct > 0 && mrrBase > 0) {
-            discountDisplay.style.display = 'flex';
-            document.getElementById('discount-amount').innerText = `- ${euro.format(discountAmt)}`;
-        } else {
-            discountDisplay.style.display = 'none';
-        }
-
         const emps = parseInt(document.getElementById('ob-employees').value) || 0;
         const hasIT = document.getElementById('ob-has-it').checked;
-        let obCost = 0, tier = "-", scope = "-";
+        let obCost = 0, tier = "-";
         if (emps > 0) {
-            if (emps < 100) { tier = hasIT ? "Self-Service" : "Scale-up Deployment"; scope = hasIT ? "Documentation" : "2h Session"; obCost = hasIT ? 0 : 200; }
-            else { tier = emps < 500 ? "Scale-up Config" : "Enterprise"; const h = Math.ceil(emps / 100) * 2; scope = `${h}h Expert Setup`; obCost = h * 100; }
+            if (emps < 100) { tier = hasIT ? "Self-Service" : "Scale-up Deployment"; obCost = hasIT ? 0 : 200; }
+            else { tier = emps < 500 ? "Scale-up Config" : "Enterprise"; const h = Math.ceil(emps / 100) * 2; obCost = h * 100; }
         }
 
         document.getElementById('ob-tier-name').innerText = tier;
-        document.getElementById('ob-tier-scope').innerText = scope;
         document.getElementById('total-ob').innerText = euro.format(obCost);
-        document.getElementById('total-mrr').innerText = euro.format(mrrDiscounted);
-        document.getElementById('total-annual').innerText = euro.format(mrrDiscounted * 12);
+        document.getElementById('total-mrr').innerText = euro.format(mrrDisc);
+        document.getElementById('total-annual').innerText = euro.format(mrrDisc * 12);
+        
+        const dr = document.getElementById('disc-row');
+        if (disc > 0 && mrrBase > 0) { dr.style.display = 'flex'; document.getElementById('disc-val').innerText = `- ${euro.format(mrrBase - mrrDisc)}`; }
+        else dr.style.display = 'none';
     }
 
     function exportToSVGText() {
-        const discountVal = document.getElementById('discount').value;
-        const mrrVal = document.getElementById('total-mrr').innerText;
-        const annualVal = document.getElementById('total-annual').innerText;
-        const obVal = document.getElementById('total-ob').innerText;
-        const employees = document.getElementById('ob-employees').value;
-        const itSize = document.getElementById('it-team-size').value;
-        const obTier = document.getElementById('ob-tier-name').innerText;
-        
-        // Requirements
+        const pink = "#f06a6a", green = "#42B891", dark = "#1a1a1a", grey = "#e0e0e0";
+        const emps = document.getElementById('ob-employees').value;
+        const it = document.getElementById('it-team-size').value || '0';
+        const tier = document.getElementById('ob-tier-name').innerText;
+        const obC = document.getElementById('total-ob').innerText;
+        const mrr = document.getElementById('total-mrr').innerText;
+        const ann = document.getElementById('total-annual').innerText;
+        const disc = document.getElementById('discount').value;
+
         const reqs = Array.from(document.querySelectorAll('.add-req:checked')).map(cb => cb.nextElementSibling.innerText);
         if (document.getElementById('req-other').checked) reqs.push("Other: " + document.getElementById('other-text').value);
 
-        let svg = `<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="1200" height="700" fill="white"/>
-            
-            <rect x="50" y="50" width="350" height="600" rx="12" stroke="#e0e0e0" fill="white"/>
-            <text x="80" y="90" fill="#f06a6a" font-family="DM Sans" font-size="13" font-weight="700">ONBOARDING SELECTION</text>
-            <text x="80" y="140" fill="#1a1a1a" font-family="DM Sans" font-size="12">Size: ${employees} emps</text>
-            <text x="80" y="165" fill="#1a1a1a" font-family="DM Sans" font-size="12">IT Team: ${itSize || 'N/A'}</text>
-            <text x="80" y="190" fill="#42B891" font-family="DM Sans" font-size="12" font-weight="700">${obTier}</text>
-            <text x="80" y="230" fill="#1a1a1a" font-family="DM Sans" font-size="12" font-weight="700">ADDITIONAL REQUESTS:</text>
-            ${reqs.map((r, i) => `<text x="90" y="${255 + (i*20)}" fill="#1a1a1a" font-family="DM Sans" font-size="11" opacity="0.7">• ${r}</text>`).join('')}
-            <text x="80" y="580" fill="#1a1a1a" font-family="DM Sans" font-size="12">Set up Cost:</text>
-            <text x="370" y="580" fill="#f06a6a" font-family="DM Sans" font-size="18" font-weight="700" text-anchor="end">${obVal}</text>
+        const licenses = Array.from(document.querySelectorAll('#recap-list tr')).map(tr => ({
+            q: tr.cells[0].innerText, n: tr.cells[1].innerText, c: tr.cells[2].innerText
+        }));
 
-            <rect x="425" y="50" width="350" height="600" rx="12" stroke="#e0e0e0" fill="white"/>
-            <text x="455" y="90" fill="#f06a6a" font-family="DM Sans" font-size="13" font-weight="700">SELECTION SUMMARY</text>
-            <text x="455" y="520" fill="#42B891" font-family="DM Sans" font-size="11">Discount: ${discountVal}%</text>
-            <text x="455" y="550" fill="#1a1a1a" font-family="DM Sans" font-size="12">Monthly Cost:</text>
-            <text x="745" y="550" fill="#f06a6a" font-family="DM Sans" font-size="22" font-weight="700" text-anchor="end">${mrrVal}</text>
-            <text x="455" y="590" fill="#1a1a1a" font-family="DM Sans" font-size="12" opacity="0.6">Annual Total:</text>
-            <text x="745" y="590" fill="#1a1a1a" font-family="DM Sans" font-size="16" font-weight="700" text-anchor="end">${annualVal}</text>
+        const prices = Array.from(document.querySelectorAll('#price-menu-list div')).map(div => ({
+            n: div.querySelector('span').innerText, p: div.querySelector('strong').innerText
+        }));
+
+        let svg = `<svg width="1300" height="800" viewBox="0 0 1300 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1300" height="800" fill="white"/>
+            
+            <rect x="50" y="50" width="380" height="700" rx="12" stroke="${grey}" fill="white"/>
+            <text x="80" y="90" fill="${pink}" font-family="DM Sans" font-size="14" font-weight="700">ONBOARDING SELECTION</text>
+            <text x="80" y="140" fill="${dark}" font-family="DM Sans" font-size="12">Company Size: ${emps} Employees</text>
+            <text x="80" y="165" fill="${dark}" font-family="DM Sans" font-size="12">IT Team Size: ${it}</text>
+            <text x="80" y="200" fill="${green}" font-family="DM Sans" font-size="13" font-weight="700">${tier}</text>
+            <text x="80" y="240" fill="${dark}" font-family="DM Sans" font-size="12" font-weight="700">SETUP REQUIREMENTS:</text>
+            ${reqs.map((r, i) => `<text x="95" y="${265 + (i * 20)}" fill="${dark}" font-family="DM Sans" font-size="11" opacity="0.7">• ${r}</text>`).join('')}
+            <line x1="80" y1="650" x2="400" y2="650" stroke="${grey}"/>
+            <text x="80" y="680" fill="${dark}" font-family="DM Sans" font-size="13" font-weight="700">SETUP COST:</text>
+            <text x="400" y="680" fill="${pink}" font-family="DM Sans" font-size="20" font-weight="700" text-anchor="end">${obC}</text>
+
+            <rect x="460" y="50" width="450" height="700" rx="12" stroke="${grey}" fill="white"/>
+            <text x="490" y="90" fill="${pink}" font-family="DM Sans" font-size="14" font-weight="700">SELECTION SUMMARY</text>
+            <text x="490" y="130" fill="${dark}" font-family="DM Sans" font-size="11" font-weight="700" opacity="0.4">QTY</text>
+            <text x="540" y="130" fill="${dark}" font-family="DM Sans" font-size="11" font-weight="700" opacity="0.4">LICENSE ITEM</text>
+            <text x="880" y="130" fill="${dark}" font-family="DM Sans" font-size="11" font-weight="700" opacity="0.4" text-anchor="end">COST</text>
+            <line x1="490" y1="140" x2="880" y2="140" stroke="${dark}" opacity="0.1"/>
+            ${licenses.map((l, i) => `
+                <text x="490" y="${165 + (i * 30)}" fill="${green}" font-family="DM Sans" font-size="12" font-weight="700">${l.q}</text>
+                <text x="540" y="${165 + (i * 30)}" fill="${dark}" font-family="DM Sans" font-size="12">${l.n}</text>
+                <text x="880" y="${165 + (i * 30)}" fill="${dark}" font-family="DM Sans" font-size="12" text-anchor="end">${l.c}</text>
+                <line x1="490" y1="${175 + (i * 30)}" x2="880" y2="${175 + (i * 30)}" stroke="${grey}" stroke-dasharray="2 2"/>
+            `).join('')}
+            
+            <text x="490" y="580" fill="${green}" font-family="DM Sans" font-size="11">Discount Applied: ${disc}%</text>
+            <text x="490" y="620" fill="${dark}" font-family="DM Sans" font-size="13">TOTAL MONTHLY (MRR):</text>
+            <text x="880" y="620" fill="${pink}" font-family="DM Sans" font-size="24" font-weight="700" text-anchor="end">${mrr}</text>
+            <text x="490" y="660" fill="${dark}" font-family="DM Sans" font-size="13" opacity="0.6">ANNUAL COMMITMENT:</text>
+            <text x="880" y="660" fill="${dark}" font-family="DM Sans" font-size="18" font-weight="700" text-anchor="end">${ann}</text>
+
+            <rect x="940" y="50" width="310" height="700" rx="12" stroke="${grey}" fill="white"/>
+            <text x="970" y="90" fill="${pink}" font-family="DM Sans" font-size="14" font-weight="700">PRICE LIST</text>
+            ${prices.map((p, i) => `
+                <text x="970" y="${140 + (i * 25)}" fill="${dark}" font-family="DM Sans" font-size="10" opacity="0.6">${p.n}</text>
+                <text x="1220" y="${140 + (i * 25)}" fill="${dark}" font-family="DM Sans" font-size="10" font-weight="700" text-anchor="end">${p.p}</text>
+            `).join('')}
         </svg>`;
 
-        const blob = new Blob([svg], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Factorial_Quote_SVG_Code.txt`;
-        link.click();
+        const b = new Blob([svg], { type: 'text/plain' });
+        const l = document.createElement('a');
+        l.href = URL.createObjectURL(b);
+        l.download = `Factorial_Quote_Table.txt`;
+        l.click();
     }
 
     init();
