@@ -58,13 +58,25 @@
         input:disabled { background-color: #f5f5f5; color: #888; cursor: not-allowed; }
 
         @media (max-width: 1100px) { .footer-grid { grid-template-columns: 1fr; } }
-    </style>
+    
+.version-toggle { display:flex; gap:8px; width:95%; max-width:1200px; margin:0 auto 25px auto; }
+.version-btn { padding:8px 22px; border-radius:20px; border:1px solid var(--border-muted); background:#fff; font-family:'DM Sans'; font-weight:700; font-size:12px; cursor:pointer; color:var(--text-dark); transition: all .2s ease; }
+.version-btn.active { background: var(--factorial-pink); color:#fff; border-color: var(--factorial-pink); }
+.selected-plan { outline: 2px solid var(--factorial-pink); }
+#v2-view .unified-module-container { grid-template-columns: repeat(5, 1fr); }
+#v2-view .footer-grid { grid-template-columns: 1fr 1fr; }
+@media (max-width: 900px) { #v2-view .unified-module-container { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
 
     <div class="utility-header"><div class="utility-text">Factorial IT / Quote Calculator</div></div>
+<div class='version-toggle'>
+  <button type='button' id='toggle-v1' class='version-btn active' onclick="switchVersion('v1')">V1</button>
+  <button type='button' id='toggle-v2' class='version-btn' onclick="switchVersion('v2')">V2</button>
+</div>
 
-    <div class="header">
+    <div id='v1-view'><div class="header">
         <h1>IT operations in <span class="pink">autopilot</span> &<br>enterprise-grade <span class="pink">security</span><br>connected to HR data</h1>
         <div class="sub-brand">factorial IT</div>
     </div>
@@ -124,6 +136,76 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
     </div>
+
+</div>
+<div id='v2-view' class='hidden'>
+<div class='header'>
+<h1>Simple pricing, <span class='pink'>per employee</span></h1>
+<div class='sub-brand'>factorial IT — V2 pricing (Direct Sales)</div>
+</div>
+
+<div class='config-section'>
+<label>Number of Employees</label>
+<input type='number' id='v2-employees' value='0' min='0' oninput='if(this.value<0)this.value=0; calculateV2()'>
+<label style='margin-left:20px;'>Discount Applied (%)</label>
+<input type='number' id='v2-discount' value='0' min='0' max='30' oninput='if(this.value<0)this.value=0; calculateV2()'>
+</div>
+
+<div class='unified-module-container' id='v2-plan-grid'>
+<div class='module-item' id='plan-item-visibility' style='cursor:pointer;' onclick="selectV2Plan('visibility')"><div class='module-top'><input type='radio' name='v2-plan' id='plan-visibility' style='pointer-events:none;'><span class='module-name'>Visibility</span></div><div style='padding-left:32px;font-size:11px;opacity:0.7;'>Know what you have & spend</div><div style='padding-left:32px;font-weight:700;color:var(--factorial-pink);margin-top:4px;'>€4 / employee</div></div>
+<div class='module-item' id='plan-item-operations' style='cursor:pointer;' onclick="selectV2Plan('operations')"><div class='module-top'><input type='radio' name='v2-plan' id='plan-operations' style='pointer-events:none;'><span class='module-name'>Operations</span></div><div style='padding-left:32px;font-size:11px;opacity:0.7;'>The IT manager's daily driver</div><div style='padding-left:32px;font-weight:700;color:var(--factorial-pink);margin-top:4px;'>€7 / employee</div></div>
+<div class='module-item' id='plan-item-compliance' style='cursor:pointer;' onclick="selectV2Plan('compliance')"><div class='module-top'><input type='radio' name='v2-plan' id='plan-compliance' style='pointer-events:none;'><span class='module-name'>Automated Compliance</span></div><div style='padding-left:32px;font-size:11px;opacity:0.7;'>Facing ISO, ENS, NIS2</div><div style='padding-left:32px;font-weight:700;color:var(--factorial-pink);margin-top:4px;'>€12 / employee</div></div>
+<div class='module-item' id='plan-item-security' style='cursor:pointer;' onclick="selectV2Plan('security')"><div class='module-top'><input type='radio' name='v2-plan' id='plan-security' style='pointer-events:none;'><span class='module-name'>Advanced Security</span></div><div style='padding-left:32px;font-size:11px;opacity:0.7;'>Everything in Compliance + MDR</div><div style='padding-left:32px;font-weight:700;color:var(--factorial-pink);margin-top:4px;'>€19 / employee</div></div>
+<div class='module-item' id='plan-item-managed' style='cursor:pointer;' onclick="selectV2Plan('managed')"><div class='module-top'><input type='radio' name='v2-plan' id='plan-managed' style='pointer-events:none;'><span class='module-name'>Managed IT</span></div><div style='padding-left:32px;font-size:11px;opacity:0.7;'>No IT team? We are your IT team</div><div style='padding-left:32px;font-weight:700;color:var(--factorial-pink);margin-top:4px;'>€29 / employee</div></div>
+</div>
+
+<div class='footer-grid'>
+<div class='formal-card'>
+<div class='card-title'>Add-on modules à la carte</div>
+<div class='module-item'>
+  <label style='display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;'>
+    <input type='checkbox' id='addon-inv' onchange='calculateV2()'> Inventory visibility (€3 / employee)
+  </label>
+</div>
+<div class='module-item'>
+  <label style='display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;'>
+    <input type='checkbox' id='addon-device' onchange='calculateV2()'> Agentic Device Management (€5 / employee)
+  </label>
+  <label style='display:flex;align-items:center;gap:8px;font-size:11px;padding-left:28px;margin-top:4px;cursor:pointer;'>
+    <input type='checkbox' id='addon-intune' onchange='calculateV2()'> Already using Intune? (€3 / employee instead)
+  </label>
+</div>
+<div class='module-item'>
+  <label style='font-size:13px;font-weight:700;'>SaaS Management</label>
+  <select id='addon-saas' onchange='calculateV2()' style="margin-top:6px;width:100%;padding:6px;border:1px solid var(--border-muted);border-radius:4px;font-family:'DM Sans';font-size:12px;">
+    <option value='none'>Not included</option>
+    <option value='visibility'>Spend visibility (€2 / employee)</option>
+    <option value='full'>With provisioning &amp; deprovisioning (€4 / employee)</option>
+  </select>
+</div>
+<div class='module-item'>
+  <label style='display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;'>
+    <input type='checkbox' id='addon-edr' onchange='calculateV2()'> SentinelOne EDR (€5 / employee)
+  </label>
+</div>
+<div class='module-item'>
+  <label style='display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;'>
+    <input type='checkbox' id='addon-mdr' onchange='calculateV2()'> SentinelOne MDR (€12 / employee, requires EDR)
+  </label>
+</div>
+<div style='font-size:10px;opacity:0.5;margin-top:8px;'>Ticketing and free ONE credits are bundled in every plan.</div>
+</div>
+<div class='formal-card'>
+  <div class='card-title'>Selection Summary</div>
+  <table class='summary-table'><thead><tr><th>Item</th><th class='val'>Unit Price</th></tr></thead><tbody id='v2-recap-list'></tbody></table>
+  <div style='margin-top:auto;padding-top:15px;border-top:1px solid #eee;'>
+    <div style='display:flex;justify-content:space-between;font-size:11px;color:var(--primary-green);display:none;' id='v2-disc-row'><span>Discount Savings</span><span id='v2-disc-val'></span></div>
+    <div style='display:flex;justify-content:space-between;font-weight:700;font-size:18px;margin-top:5px;'><span>Monthly Cost</span><span id='v2-total-mrr' style='color:var(--factorial-pink);'>0,00 €</span></div>
+    <div style='display:flex;justify-content:space-between;font-size:13px;opacity:0.6;'><span>Annual Cost</span><span id='v2-total-annual'>0,00 €</span></div>
+  </div>
+</div>
+</div>
+</div>
 
 <script>
     const modules = [
@@ -380,7 +462,119 @@
         link.click();
     }
 
-    window.onload = init;
+    
+    var v2Plans = [
+        { id: 'visibility', name: 'Visibility', cost: 4, includes: { invVisibility: true, deviceMgmt: false, edr: false, mdr: false } },
+        { id: 'operations', name: 'Operations', cost: 7, includes: { invVisibility: true, deviceMgmt: true, edr: false, mdr: false } },
+        { id: 'compliance', name: 'Automated Compliance', cost: 12, includes: { invVisibility: true, deviceMgmt: true, edr: true, mdr: false } },
+        { id: 'security', name: 'Advanced Security', cost: 19, includes: { invVisibility: true, deviceMgmt: true, edr: true, mdr: true } },
+        { id: 'managed', name: 'Managed IT', cost: 29, includes: { invVisibility: true, deviceMgmt: true, edr: true, mdr: true } }
+    ];
+    var v2SelectedPlan = 'visibility';
+
+    function selectV2Plan(id) {
+        v2SelectedPlan = id;
+        calculateV2();
+    }
+
+    function getV2Plan() {
+        for (var i = 0; i < v2Plans.length; i++) { if (v2Plans[i].id === v2SelectedPlan) return v2Plans[i]; }
+        return v2Plans[0];
+    }
+
+    function initV2() {
+        calculateV2();
+    }
+
+    function switchVersion(v) {
+        var isV1 = (v === 'v1');
+        document.getElementById('v1-view').classList.toggle('hidden', !isV1);
+        document.getElementById('v2-view').classList.toggle('hidden', isV1);
+        document.getElementById('toggle-v1').classList.toggle('active', isV1);
+        document.getElementById('toggle-v2').classList.toggle('active', !isV1);
+    }
+
+    function calculateV2() {
+        var plan = getV2Plan();
+        var included = plan.includes;
+
+        var planItems = document.querySelectorAll('#v2-plan-grid .module-item');
+        for (var p = 0; p < planItems.length; p++) {
+            var el = planItems[p];
+            var isSel = (el.id === 'plan-item-' + plan.id);
+            el.classList.toggle('selected-plan', isSel);
+            var radio = el.querySelector('input[type=radio]');
+            if (radio) radio.checked = isSel;
+        }
+
+        var emps = parseInt(document.getElementById('v2-employees').value) || 0;
+        var discInput = parseFloat(document.getElementById('v2-discount').value) || 0;
+        if (discInput < 0) { discInput = 0; document.getElementById('v2-discount').value = 0; }
+        if (discInput > 30) { discInput = 30; document.getElementById('v2-discount').value = 30; }
+        var mult = (100 - discInput) / 100;
+
+        var invEl = document.getElementById('addon-inv');
+        var deviceEl = document.getElementById('addon-device');
+        var intuneEl = document.getElementById('addon-intune');
+        var saasEl = document.getElementById('addon-saas');
+        var edrEl = document.getElementById('addon-edr');
+        var mdrEl = document.getElementById('addon-mdr');
+
+        invEl.disabled = included.invVisibility;
+        if (included.invVisibility) invEl.checked = false;
+
+        deviceEl.disabled = included.deviceMgmt;
+        if (included.deviceMgmt) deviceEl.checked = false;
+        intuneEl.disabled = included.deviceMgmt || !deviceEl.checked;
+        if (intuneEl.disabled && !included.deviceMgmt) intuneEl.checked = intuneEl.checked;
+
+        edrEl.disabled = included.edr;
+        if (included.edr) edrEl.checked = false;
+
+        var edrActive = edrEl.checked || included.edr;
+        mdrEl.disabled = included.mdr || !edrActive;
+        if (included.mdr || !edrActive) mdrEl.checked = false;
+
+        var base = plan.cost;
+        var items = [{ name: plan.name + ' plan', cost: plan.cost }];
+
+        if (invEl.checked && !included.invVisibility) { base += 3; items.push({ name: 'Inventory visibility', cost: 3 }); }
+        if (deviceEl.checked && !included.deviceMgmt) {
+            var dc = intuneEl.checked ? 3 : 5;
+            base += dc;
+            items.push({ name: 'Agentic Device Management' + (intuneEl.checked ? ' (on top of Intune)' : ''), cost: dc });
+        }
+        if (saasEl.value === 'visibility') { base += 2; items.push({ name: 'SaaS Management (spend visibility)', cost: 2 }); }
+        else if (saasEl.value === 'full') { base += 4; items.push({ name: 'SaaS Management (provisioning & deprovisioning)', cost: 4 }); }
+        if (edrEl.checked && !included.edr) { base += 5; items.push({ name: 'SentinelOne EDR', cost: 5 }); }
+        if (mdrEl.checked && !included.mdr) { base += 12; items.push({ name: 'SentinelOne MDR', cost: 12 }); }
+
+        var mrrBase = base * emps;
+        var mrrDisc = mrrBase * mult;
+
+        var recap = document.getElementById('v2-recap-list');
+        recap.innerHTML = '';
+        for (var k = 0; k < items.length; k++) {
+            var tr = document.createElement('tr');
+            var td1 = document.createElement('td'); td1.textContent = items[k].name;
+            var td2 = document.createElement('td'); td2.className = 'val'; td2.textContent = euro.format(items[k].cost) + ' x ' + emps;
+            tr.appendChild(td1); tr.appendChild(td2);
+            recap.appendChild(tr);
+        }
+
+        document.getElementById('v2-total-mrr').innerText = euro.format(mrrDisc);
+        document.getElementById('v2-total-annual').innerText = euro.format(mrrDisc * 12);
+
+        var dr = document.getElementById('v2-disc-row');
+        if (discInput > 0 && mrrBase > 0) {
+            dr.style.display = 'flex';
+            document.getElementById('v2-disc-val').innerText = '- ' + euro.format(mrrBase - mrrDisc);
+        } else {
+            dr.style.display = 'none';
+        }
+    }
+
+    window.onload = function(){ init(); initV2(); };
 </script>
 </body>
 </html>
